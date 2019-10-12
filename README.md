@@ -3,8 +3,8 @@ MQTT camera for esp-idf.
 Take a photo via MQTT.   
 
 ```
-git clone https://github.com/nopnop2002/esp-idf-remote-camera
-cd esp-idf-remote-camera
+git clone https://github.com/nopnop2002/esp-idf-mqtt-camera
+cd esp-idf-mqtt-camera
 git clone https://github.com/espressif/esp32-camera components
 make menuconfig
 make flash monitor
