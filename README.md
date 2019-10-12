@@ -1,6 +1,6 @@
 # esp-idf-mqtt-camera
 MQTT camera for esp-idf.   
-Take a photo via MQTT.   
+Take a picture and Publish it via MQTT.   
 
 ```
 git clone https://github.com/nopnop2002/esp-idf-mqtt-camera
