@@ -33,23 +33,23 @@ Set the following items using menuconfig.
 
 ![config-app](https://user-images.githubusercontent.com/6020549/66692054-c5aab900-ecd5-11e9-9b1d-b1200e555df5.jpg)
 
-# Wifi
+- Wifi
 
 ![config-wifi](https://user-images.githubusercontent.com/6020549/66692062-e4a94b00-ecd5-11e9-9ea7-afb74cc347af.jpg)
 
-# MQTT Server
+- MQTT Server
 
 ![config-mqtt](https://user-images.githubusercontent.com/6020549/66692167-b5dfa480-ecd6-11e9-9b56-02e662f67d38.jpg)
 
-# Camera Pin
+- Camera Pin
 
 ![config-camerapin](https://user-images.githubusercontent.com/6020549/66692087-1d492480-ecd6-11e9-8b69-68191005a453.jpg)
 
-# Picture Size
+- Picture Size
 
 ![config-picturesize](https://user-images.githubusercontent.com/6020549/66692095-26d28c80-ecd6-11e9-933e-ab0be911ecd2.jpg)
 
-# Shutter method
+- Shutter method
 
 You can choose one of the following shutter methods
 
