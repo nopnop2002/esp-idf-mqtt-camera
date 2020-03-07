@@ -93,7 +93,7 @@ ESP32-CAM by AI-Thinker have flash light on GPIO4.
 
 # How to save picture file
 You can use saveFile.py.   
-Please change the following parts according to your environment.   
+Please change the following according to your environment.   
 
 ```
 # MQTT Broker
