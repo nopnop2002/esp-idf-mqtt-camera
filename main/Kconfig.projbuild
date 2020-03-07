@@ -42,7 +42,7 @@ menu "Application Configuration"
 
 		choice CAMERA_MODEL
 			bool "Select Camera Pinout"
-			default CAMERA_MODEL_WROVER_KIT
+			default CAMERA_MODEL_AI_THINKER
 			help
 				Select Camera Pinout.
 

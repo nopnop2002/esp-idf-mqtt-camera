@@ -6,6 +6,18 @@ Take a picture and Publish it via MQTT.
 
 ![0002](https://user-images.githubusercontent.com/6020549/66692498-ea089480-ecd9-11e9-93fa-b011a5103140.jpg)
 
+# Install
+Use a USB-TTL converter.   
+
+|ESP-32|USB-TTL|
+|:-:|:-:|
+|U0TXD|RXD|
+|U0RXD|TXD|
+|GPIO0|GND|
+|5V|5V|
+|GND|GND|
+
+
 ```
 git clone https://github.com/nopnop2002/esp-idf-mqtt-camera
 cd esp-idf-mqtt-camera
@@ -14,6 +26,7 @@ make menuconfig
 make flash monitor
 ```
 
+# Configuration
 Set the following items using menuconfig.
 
 ![config-main](https://user-images.githubusercontent.com/6020549/66692052-c17e9b80-ecd5-11e9-8316-075350ceb2e9.jpg)
@@ -42,12 +55,12 @@ You can choose one of the following shutter methods
 
 ![config-shutter-1](https://user-images.githubusercontent.com/6020549/66692107-381b9900-ecd6-11e9-8d73-1ee7423c5188.jpg)
 
-## Shutter is the Enter key on the keyboard   
+- Shutter is the Enter key on the keyboard   
 For operation check
 
 ![config-shutter-2](https://user-images.githubusercontent.com/6020549/66692119-4964a580-ecd6-11e9-9695-bfd3d61dc20a.jpg)
 
-## Shutter is a GPIO toggle
+- Shutter is a GPIO toggle
 
 Initial Sate is PULLDOWN   
 The shutter is prepared when it is turned from OFF to ON, and a picture is taken when it is turned from ON to OFF.   
@@ -67,12 +80,12 @@ I confirmed that the following GPIO can be used.
 
 ![config-shutter-3](https://user-images.githubusercontent.com/6020549/66692126-5b464880-ecd6-11e9-8823-e8a9a5fa1eed.jpg)
 
-## Shutter is MQTT Publish   
+- Shutter is MQTT Publish   
 You can use pub.py.   
 
 ![config-shutter-4](https://user-images.githubusercontent.com/6020549/66692137-6c8f5500-ecd6-11e9-90ef-b83981ea4809.jpg)
 
-## Flash Light
+- Flash Light
 
 ESP32-CAM by AI-Thinker have flash light on GPIO4.
 
