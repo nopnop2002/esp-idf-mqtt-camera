@@ -62,10 +62,10 @@ For operation check
 
 - Shutter is a GPIO toggle
 
-Initial Sate is PULLDOWN   
+  - Initial Sate is PULLDOWN   
 The shutter is prepared when it is turned from OFF to ON, and a picture is taken when it is turned from ON to OFF.   
 
-Initial Sate is PULLUP   
+  - Initial Sate is PULLUP   
 The shutter is prepared when it is turned from ON to OFF, and a picture is taken when it is turned from OFF to ON.   
 
 I confirmed that the following GPIO can be used.   
