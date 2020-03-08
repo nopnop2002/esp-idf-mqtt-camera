@@ -100,17 +100,23 @@ void mqtt_pub(void *pvParameters)
 
 			//acquire a frame
 			camera_fb_t * fb = esp_camera_fb_get();
+			if (fb) {
+				//int msg_id = esp_mqtt_client_publish(mqtt_client, CONFIG_PUB_TOPIC, "test", 0, 1, 0);
+				int msg_id = esp_mqtt_client_publish(mqtt_client, CONFIG_PUB_TOPIC, (char *)fb->buf, fb->len, 1, 0);
+				ESP_LOGI(TAG, "sent publish successful, msg_id=%d fb->len=%d", msg_id, fb->len);
+
+				//return the frame buffer back to the driver for reuse
+				esp_camera_fb_return(fb);
+			} else {
+				ESP_LOGE(TAG, "Camera Capture Failed");
+			}
+
+#if 0
 			if (!fb) {
 				ESP_LOGE(TAG, "Camera Capture Failed");
 				continue;
 			}
-
-			//int msg_id = esp_mqtt_client_publish(mqtt_client, CONFIG_PUB_TOPIC, "test", 0, 1, 0);
-			int msg_id = esp_mqtt_client_publish(mqtt_client, CONFIG_PUB_TOPIC, (char *)fb->buf, fb->len, 1, 0);
-			ESP_LOGI(TAG, "sent publish successful, msg_id=%d fb->len=%d", msg_id, fb->len);
-
-			//return the frame buffer back to the driver for reuse
-			esp_camera_fb_return(fb);
+#endif
 
 #if CONFIG_ENABLE_FLASH
 			// Flash Light OFF
