@@ -6,6 +6,9 @@ Take a picture and Publish it via MQTT.
 
 ![0002](https://user-images.githubusercontent.com/6020549/66692498-ea089480-ecd9-11e9-93fa-b011a5103140.jpg)
 
+# Software requirements
+esp-idf ver4.1 or later.   
+
 # Install
 Use a USB-TTL converter.   
 
