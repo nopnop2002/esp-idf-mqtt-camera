@@ -112,12 +112,12 @@ void mqtt_sub(void *pvParameters)
 			if (xQueueSend(xQueueCmd, &cmdBuf, 10) != pdPASS) {
 				ESP_LOGE(TAG, "xQueueSend fail");
 			}
-		} else if (mqttBuf.topic_type == STOP) {
-			ESP_LOGI(TAG, "Task Delete");
-			esp_mqtt_client_stop(mqtt_client);
-			vTaskDelete(NULL);
-		}
-	}
+		} // end if
+	} // end while
 
+	// Never reach here
+	ESP_LOGI(TAG, "Task Delete");
+	esp_mqtt_client_stop(mqtt_client);
+	vTaskDelete(NULL);
 }
 #endif
