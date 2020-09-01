@@ -29,6 +29,7 @@ make menuconfig
 make flash monitor
 ```
 
+# Start firmware
 Change GPIO0 to open and press the RESET button.
 
 # Configuration
