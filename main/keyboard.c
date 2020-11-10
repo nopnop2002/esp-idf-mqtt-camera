@@ -30,9 +30,8 @@ void keyin(void *pvParameters)
 		//ESP_LOGI(TAG, "c=%x", c);
 		if (c == 0x0a) {
 			ESP_LOGI(TAG, "Push Enter");
-			//xQueueSend(xQueueCmd, &cmdBuf, 0);
 			if (xQueueSend(xQueueCmd, &cmdBuf, 10) != pdPASS) {
-				ESP_LOGI(TAG, "xQueueSend fail");
+				ESP_LOGE(TAG, "xQueueSend fail");
 			}
 		}
 	}
