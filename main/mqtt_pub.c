@@ -111,12 +111,6 @@ void mqtt_pub(void *pvParameters)
 				ESP_LOGE(TAG, "Camera Capture Failed");
 			}
 
-#if 0
-			if (!fb) {
-				ESP_LOGE(TAG, "Camera Capture Failed");
-				continue;
-			}
-#endif
 
 #if CONFIG_ENABLE_FLASH
 			// Flash Light OFF

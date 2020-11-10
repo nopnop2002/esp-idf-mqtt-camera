@@ -43,30 +43,7 @@ static int s_retry_num = 0;
 void mqtt_pub(void *pvParameters);
 
 #if CONFIG_SHUTTER_ENTER
-void keyin(void *pvParameters)
-{
-	ESP_LOGI(pcTaskGetTaskName(0), "Start");
-	CMD_t cmdBuf;
-	cmdBuf.taskHandle = xTaskGetCurrentTaskHandle();
-	cmdBuf.command = CMD_TAKE;
-
-	uint16_t c;
-	while (1) {
-		c = fgetc(stdin);
-		if (c == 0xffff) {
-			vTaskDelay(10);
-			continue;
-		}
-		//ESP_LOGI(pcTaskGetTaskName(0), "c=%x", c);
-		if (c == 0x0a) {
-			ESP_LOGI(pcTaskGetTaskName(0), "Push Enter");
-			//xQueueSend(xQueueCmd, &cmdBuf, 0);
-			if (xQueueSend(xQueueCmd, &cmdBuf, 10) != pdPASS) {
-				ESP_LOGE(TAG, "xQueueSend fail");
-			}
-		}
-	}
-}
+void keyin(void *pvParameters);
 #endif
 
 #if CONFIG_SHUTTER_GPIO
@@ -227,17 +204,14 @@ void app_main(void)
 
 	/* Create Shutter Task */
 #if CONFIG_SHUTTER_ENTER
-#define SHUTTER "Keybord Enter"
 	xTaskCreate(keyin, "KEYIN", 1024*4, NULL, 2, NULL);
 #endif
 
 #if CONFIG_SHUTTER_GPIO
-#define SHUTTER "GPIO Input"
 	xTaskCreate(gpio, "GPIO", 1024*4, NULL, 2, NULL);
 #endif
 
 #if CONFIG_SHUTTER_MQTT
-#define SHUTTER "MQTT Input"
 	xQueueSubscribe = xQueueCreate( 10, sizeof(MQTT_t) );
 	configASSERT( xQueueSubscribe );
 	xTaskCreate(mqtt_sub, "SUB", 1024*4, NULL, 2, NULL);

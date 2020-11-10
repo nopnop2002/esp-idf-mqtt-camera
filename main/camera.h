@@ -151,6 +151,7 @@ extern "C" {
 #endif
 
 esp_err_t camera_detect();
+esp_err_t camera_capture(char * FileName, size_t *pictureSize);
 void printFrameSize(int size);
 
 #ifdef __cplusplus

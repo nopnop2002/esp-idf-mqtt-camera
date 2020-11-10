@@ -46,18 +46,18 @@ menu "Application Configuration"
 			help
 				Select Camera Pinout.
 
-		config CAMERA_MODEL_WROVER_KIT
-			bool "WROVER-KIT With OV2640 Module"
-		config CAMERA_MODEL_ESP_EYE
-			bool "ESP_EYE DevKit"
-		config CAMERA_MODEL_M5STACK_PSRAM
-			bool "M5Stack Camera With PSRAM"
-		config CAMERA_MODEL_M5STACK_WIDE
-			bool "M5Stack Camera F (Wide)"
-		config CAMERA_MODEL_AI_THINKER
-			bool "ESP32-CAM by AI-Thinker"
-		config CAMERA_MODEL_CUSTOM
-			bool "Custom Camera Pinout"
+			config CAMERA_MODEL_WROVER_KIT
+				bool "WROVER-KIT With OV2640 Module"
+			config CAMERA_MODEL_ESP_EYE
+				bool "ESP_EYE DevKit"
+			config CAMERA_MODEL_M5STACK_PSRAM
+				bool "M5Stack Camera With PSRAM"
+			config CAMERA_MODEL_M5STACK_WIDE
+				bool "M5Stack Camera F (Wide)"
+			config CAMERA_MODEL_AI_THINKER
+				bool "ESP32-CAM by AI-Thinker"
+			config CAMERA_MODEL_CUSTOM
+				bool "Custom Camera Pinout"
 		endchoice
 
 		config CAMERA_PIN_PWDN
@@ -198,11 +198,11 @@ menu "Application Configuration"
 			help
 				Select whether to use PSRAM
 
-		config USE_PSRAM
-			bool "Use PSRAM"
+			config USE_PSRAM
+				bool "Use PSRAM"
 
-		config DONT_USE_PSRAM
-			bool "Do not use PSRAM"
+			config DONT_USE_PSRAM
+				bool "Do not use PSRAM"
 
 		endchoice
 
@@ -212,22 +212,24 @@ menu "Application Configuration"
 			help
 				Select Picture Frame Size.
 
-		config FRAMESIZE_QQVGA
-			bool "Frame Size:160x120"
-		config FRAMESIZE_QQVGA2
-			bool "Frame Size:128x160"
-		config FRAMESIZE_QCIF
-			bool "Frame Size:176x144"
-		config FRAMESIZE_HQVGA
-			bool "Frame Size:240x176"
-		config FRAMESIZE_QVGA
-			bool "Frame Size:320x240"
-		config FRAMESIZE_CIF
-			bool "Frame Size:400x296"
-		config FRAMESIZE_VGA
-			bool "Frame Size:640x480"
-		config FRAMESIZE_SVGA
-			bool "Frame Size:800x600"
+			config FRAMESIZE_QQVGA
+				bool "Frame Size:160x120"
+			config FRAMESIZE_QCIF
+				bool "Frame Size:176x144"
+			config FRAMESIZE_HQVGA
+				bool "Frame Size:240x176"
+			config FRAMESIZE_240X240
+				bool "Frame Size:240x240"
+			config FRAMESIZE_QVGA
+				bool "Frame Size:320x240"
+			config FRAMESIZE_CIF
+				bool "Frame Size:400x296"
+			config FRAMESIZE_HVGA
+				bool "Frame Size:480x320"
+			config FRAMESIZE_VGA
+				bool "Frame Size:640x480"
+			config FRAMESIZE_SVGA
+				bool "Frame Size:800x600"
 		endchoice
 
 	endmenu
@@ -240,12 +242,12 @@ menu "Application Configuration"
 			help
 				Selecting the shutter method
 
-		config SHUTTER_ENTER
-			bool "Use Enter key"
-		config SHUTTER_GPIO
-			bool "Use GPIO"
-		config SHUTTER_MQTT
-			bool "Use MQTT Subscribe"
+			config SHUTTER_ENTER
+				bool "Use Enter key"
+			config SHUTTER_GPIO
+				bool "Use GPIO"
+			config SHUTTER_MQTT
+				bool "Use MQTT Subscribe"
 
 		endchoice
 
@@ -264,15 +266,15 @@ menu "Application Configuration"
 			help
 				Select initial state of GPIO.
 
-		config GPIO_PULLUP
-			bool "GPIO_PULLUP"
-			help
-				The initial state of GPIO is Pull-UP.
+			config GPIO_PULLUP
+				bool "GPIO_PULLUP"
+				help
+					The initial state of GPIO is Pull-UP.
 
-		config GPIO_PULLDOWN
-			bool "GPIO_PULLDOWN"
-			help
-				The initial state of GPIO is Pull-Down.
+			config GPIO_PULLDOWN
+				bool "GPIO_PULLDOWN"
+				help
+					The initial state of GPIO is Pull-Down.
 
 		endchoice
 
