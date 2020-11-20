@@ -2,9 +2,9 @@
 MQTT camera for esp-idf.   
 Take a picture and Publish it via MQTT.   
 
-![スライド1](https://user-images.githubusercontent.com/6020549/98742579-06519600-23f2-11eb-83f7-683e66d12dfa.JPG)
+![スライド1](https://user-images.githubusercontent.com/6020549/99764072-90f76b00-2b3f-11eb-8cf1-a01b93e5309e.JPG)
 
-![スライド2](https://user-images.githubusercontent.com/6020549/98742589-094c8680-23f2-11eb-9dcc-39b9b570d5b2.JPG)
+![スライド2](https://user-images.githubusercontent.com/6020549/99764076-93f25b80-2b3f-11eb-915a-d1e39bb57295.JPG)
 
 # Software requirements
 esp-idf ver4.1 or later.   
