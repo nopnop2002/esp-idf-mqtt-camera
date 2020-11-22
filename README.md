@@ -6,13 +6,13 @@ Take a picture and Publish it via MQTT.
 ![ƒXƒ‰ƒCƒh2](https://user-images.githubusercontent.com/6020549/99764076-93f25b80-2b3f-11eb-915a-d1e39bb57295.JPG)
 
 # Software requirements
-esp-idf v4.0.2-120.
+esp-idf v4.0.2-120.   
 git clone -b release/v4.0 --recursive https://github.com/espressif/esp-idf.git
 
-esp-idf v4.1-520.
+esp-idf v4.1-520.   
 git clone -b release/v4.1 --recursive https://github.com/espressif/esp-idf.git
 
-It does not work with esp-idf v4.3.
+__It does not work with esp-idf v4.3.__
 
 # Installation
 Use a USB-TTL converter.   
@@ -94,8 +94,6 @@ You can use pub.py.
 Please change the following according to your environment.   
 
 ```
-vi pub.py
-
 # MQTT Broker
 #host = '192.168.10.40'
 host = 'test.mosquitto.org'
@@ -103,10 +101,6 @@ host = 'test.mosquitto.org'
 port = 1883
 # MQTT Publish Topic
 topic = '/topic/picture/sub'
-
-pip install paho-mqtt
-
-python pub.py
 ```
 
 ![config-shutter-3](https://user-images.githubusercontent.com/6020549/99891865-d340b980-2cb1-11eb-9da5-944bd6a07c17.jpg)
@@ -122,8 +116,6 @@ You can use saveFile.py.
 Please change the following according to your environment.   
 
 ```
-vi saveFile.py
-
 # MQTT Broker
 #host = '192.168.10.40'
 host = 'test.mosquitto.org'
@@ -133,8 +125,4 @@ port = 1883
 topic = '/topic/picture/pub'
 # Save File
 saveFile = './output.jpg'
-
-pip install paho-mqtt
-
-python saveFile.py
 ```
