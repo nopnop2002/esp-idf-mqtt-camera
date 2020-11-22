@@ -20,9 +20,11 @@
 #include "esp_event.h"
 #include "nvs_flash.h"
 #include "esp_sntp.h"
+#include "mqtt_client.h"
 
+#include "esp_camera.h"
+#include "camera.h"
 #include "cmd.h"
-#include "mqtt.h"
 
 /* FreeRTOS event group to signal when we are connected*/
 EventGroupHandle_t status_event_group;
@@ -34,7 +36,6 @@ int WIFI_CONNECTED_BIT = BIT2;
 int MQTT_CONNECTED_BIT = BIT4;
 
 QueueHandle_t xQueueCmd;
-QueueHandle_t xQueueSubscribe;
 
 static const char *TAG = "MAIN";
 
@@ -74,12 +75,45 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 	} else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
 		ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
 		ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
-#if 0
-		ESP_LOGI(TAG, "got ip:%s", ip4addr_ntoa(&event->ip_info.ip));
-#endif
 		s_retry_num = 0;
 		xEventGroupSetBits(status_event_group, WIFI_CONNECTED_BIT);
 	}
+}
+
+
+
+static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
+{
+	// your_context_t *context = event->context;
+	switch (event->event_id) {
+		case MQTT_EVENT_CONNECTED:
+			ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
+			xEventGroupSetBits(status_event_group, MQTT_CONNECTED_BIT);
+			break;
+		case MQTT_EVENT_DISCONNECTED:
+			ESP_LOGW(TAG, "MQTT_EVENT_DISCONNECTED");
+			xEventGroupClearBits(status_event_group, MQTT_CONNECTED_BIT);
+			break;
+		case MQTT_EVENT_SUBSCRIBED:
+			ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
+			break;
+		case MQTT_EVENT_UNSUBSCRIBED:
+			ESP_LOGI(TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
+			break;
+		case MQTT_EVENT_PUBLISHED:
+			ESP_LOGI(TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
+			break;
+		case MQTT_EVENT_DATA:
+			ESP_LOGI(TAG, "MQTT_EVENT_DATA");
+			break;
+		case MQTT_EVENT_ERROR:
+			ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
+			break;
+		default:
+			ESP_LOGI(TAG, "Other event id:%d", event->event_id);
+			break;
+	}
+	return ESP_OK;
 }
 
 
@@ -118,38 +152,6 @@ void wifi_init_sta(void)
 	ESP_LOGI(TAG, "connect to ap SSID:%s", CONFIG_ESP_WIFI_SSID);
 }
 
-#if 0
-void time_sync_notification_cb(struct timeval *tv)
-{
-	ESP_LOGI(TAG, "Notification of a time synchronization event");
-}
-
-static void initialize_sntp(void)
-{
-	ESP_LOGI(TAG, "Initializing SNTP");
-	sntp_setoperatingmode(SNTP_OPMODE_POLL);
-	//sntp_setservername(0, "pool.ntp.org");
-	ESP_LOGI(TAG, "Your NTP Server is %s", CONFIG_NTP_SERVER);
-	sntp_setservername(0, CONFIG_NTP_SERVER);
-	sntp_set_time_sync_notification_cb(time_sync_notification_cb);
-	sntp_init();
-}
-
-static esp_err_t obtain_time(void)
-{
-	initialize_sntp();
-	// wait for time to be set
-	int retry = 0;
-	const int retry_count = 10;
-	while (sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET && ++retry < retry_count) {
-		ESP_LOGI(TAG, "Waiting for system time to be set... (%d/%d)", retry, retry_count);
-		vTaskDelay(2000 / portTICK_PERIOD_MS);
-	}
-
-	if (retry == retry_count) return ESP_FAIL;
-	return ESP_OK;
-}
-#endif
 
 void app_main(void)
 {
@@ -168,25 +170,6 @@ void app_main(void)
 	ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
 	wifi_init_sta();
 
-#if 0
-	// obtain time over NTP
-	ESP_LOGI(TAG, "Connecting to WiFi and getting time over NTP.");
-	ret = obtain_time();
-	if(ret != ESP_OK) {
-		ESP_LOGE(TAG, "Fail to getting time over NTP.");
-		return;
-	}
-
-	// update 'now' variable with current time
-	time_t now;
-	struct tm timeinfo;
-	char strftime_buf[64];
-	time(&now);
-	now = now + (CONFIG_LOCAL_TIMEZONE*60*60);
-	localtime_r(&now, &timeinfo);
-	strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
-	ESP_LOGI(TAG, "The current date/time is: %s", strftime_buf);
-#endif
 
 #if CONFIG_ENABLE_FLASH
 	// Enable Flash Light
@@ -199,22 +182,75 @@ void app_main(void)
 	xQueueCmd = xQueueCreate( 10, sizeof(CMD_t) );
 	configASSERT( xQueueCmd );
 
+#if 0
 	/* Start task */
 	xTaskCreate(mqtt_pub, "PUB", 1024*4, NULL, 2, NULL);
+#endif
 
 	/* Create Shutter Task */
 #if CONFIG_SHUTTER_ENTER
+#define SHUTTER "Keybord Enter"
 	xTaskCreate(keyin, "KEYIN", 1024*4, NULL, 2, NULL);
 #endif
 
 #if CONFIG_SHUTTER_GPIO
+#define SHUTTER "GPIO Input"
 	xTaskCreate(gpio, "GPIO", 1024*4, NULL, 2, NULL);
 #endif
 
 #if CONFIG_SHUTTER_MQTT
-	xQueueSubscribe = xQueueCreate( 10, sizeof(MQTT_t) );
-	configASSERT( xQueueSubscribe );
+#define SHUTTER "MQTT Input"
 	xTaskCreate(mqtt_sub, "SUB", 1024*4, NULL, 2, NULL);
 #endif
 
+	esp_mqtt_client_config_t mqtt_cfg = {
+		.uri = CONFIG_BROKER_URL,
+		.event_handle = mqtt_event_handler,
+		.client_id = "publish",
+	};
+	esp_mqtt_client_handle_t mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
+	esp_mqtt_client_start(mqtt_client);
+
+	/* Detect camera */
+	ret = camera_detect();
+	if (ret != ESP_OK) return;
+	
+    CMD_t cmdBuf;
+    while (1) {
+		ESP_LOGI(TAG,"Waitting %s ....", SHUTTER);
+        xQueueReceive(xQueueCmd, &cmdBuf, portMAX_DELAY);
+        ESP_LOGI(TAG, "cmdBuf.command=%d", cmdBuf.command);
+        if (cmdBuf.command == CMD_HALT) break;
+
+        EventBits_t EventBits = xEventGroupGetBits(status_event_group);
+        ESP_LOGI(TAG, "EventBits=%x", EventBits);
+        if (EventBits & MQTT_CONNECTED_BIT) {
+
+#if CONFIG_ENABLE_FLASH
+            // Flash Light ON
+            gpio_set_level(CONFIG_GPIO_FLASH, 1);
+#endif
+
+            //acquire a frame
+            camera_fb_t * fb = esp_camera_fb_get();
+            if (fb) {
+                //int msg_id = esp_mqtt_client_publish(mqtt_client, CONFIG_PUB_TOPIC, "test", 0, 1, 0);
+                int msg_id = esp_mqtt_client_publish(mqtt_client, CONFIG_PUB_TOPIC, (char *)fb->buf, fb->len, 1, 0);
+                ESP_LOGI(TAG, "sent publish successful, msg_id=%d fb->len=%d", msg_id, fb->len);
+
+                //return the frame buffer back to the driver for reuse
+                esp_camera_fb_return(fb);
+            } else {
+                ESP_LOGE(TAG, "Camera Capture Failed");
+            }
+
+
+#if CONFIG_ENABLE_FLASH
+            // Flash Light OFF
+            gpio_set_level(CONFIG_GPIO_FLASH, 0);
+#endif
+        } else {
+            ESP_LOGW(TAG, "MQTT server not connected");
+        }
+	} // end while
 }

@@ -285,22 +285,23 @@ menu "Application Configuration"
 			help
 				Topic of subscribe
 
-		config ENABLE_FLASH
-			bool "Enable Flash Light"
-			help
-				Enable Flash Light.
-
-		config GPIO_FLASH
-			int "Flash GPIO number"
-			depends on ENABLE_FLASH
-			range 4 34
-			default 4
-			help
-				GPIO number (IOxx) to Button Input.
-				Some GPIOs are used for other purposes (flash connections, etc.) and cannot be used to Button.
-
-
 	endmenu
+
+	config ENABLE_FLASH
+		bool "Enable Flash Light"
+		help
+			Enable Flash Light.
+
+	config GPIO_FLASH
+		int "Flash GPIO number"
+		depends on ENABLE_FLASH
+		range 4 34
+		default 4
+		help
+			GPIO number (IOxx) to Button Input.
+			Some GPIOs are used for other purposes (flash connections, etc.) and cannot be used to Button.
+
+
 
 endmenu
 

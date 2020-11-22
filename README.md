@@ -6,9 +6,15 @@ Take a picture and Publish it via MQTT.
 ![ƒXƒ‰ƒCƒh2](https://user-images.githubusercontent.com/6020549/99764076-93f25b80-2b3f-11eb-915a-d1e39bb57295.JPG)
 
 # Software requirements
-esp-idf ver4.1 or later.   
+esp-idf v4.0.2-120.
+git clone -b release/v4.0 --recursive https://github.com/espressif/esp-idf.git
 
-# Install
+esp-idf v4.1-520.
+git clone -b release/v4.1 --recursive https://github.com/espressif/esp-idf.git
+
+It does not work with esp-idf v4.3.
+
+# Installation
 Use a USB-TTL converter.   
 
 |ESP-32|USB-TTL|
@@ -34,36 +40,34 @@ Change GPIO0 to open and press the RESET button.
 # Configuration
 Set the following items using menuconfig.
 
-![config-main](https://user-images.githubusercontent.com/6020549/66692052-c17e9b80-ecd5-11e9-8316-075350ceb2e9.jpg)
+![config-main](https://user-images.githubusercontent.com/6020549/99891822-7f35d500-2cb1-11eb-928c-be9a8191dec9.jpg)
 
-![config-app](https://user-images.githubusercontent.com/6020549/66692054-c5aab900-ecd5-11e9-9b1d-b1200e555df5.jpg)
+![config-app](https://user-images.githubusercontent.com/6020549/99891825-852bb600-2cb1-11eb-8946-ab9ed2253390.jpg)
 
 ## Wifi Setting
 
-![config-wifi](https://user-images.githubusercontent.com/6020549/66692062-e4a94b00-ecd5-11e9-9ea7-afb74cc347af.jpg)
+![config-wifi](https://user-images.githubusercontent.com/6020549/99891826-8ceb5a80-2cb1-11eb-8470-f5ceb9e4576a.jpg)
 
 ## MQTT Server Setting
 
-![config-mqtt](https://user-images.githubusercontent.com/6020549/66692167-b5dfa480-ecd6-11e9-9b56-02e662f67d38.jpg)
+![config-mqtt](https://user-images.githubusercontent.com/6020549/99891829-95439580-2cb1-11eb-8aad-3f697fa0513b.jpg)
 
 ## Camera Pin
 
-![config-camerapin](https://user-images.githubusercontent.com/6020549/66692087-1d492480-ecd6-11e9-8b69-68191005a453.jpg)
+![config-camerapin](https://user-images.githubusercontent.com/6020549/99891832-9ffe2a80-2cb1-11eb-8941-4b31ce900ea9.jpg)
 
 ## Picture Size
 
-![config-picturesize](https://user-images.githubusercontent.com/6020549/66692095-26d28c80-ecd6-11e9-933e-ab0be911ecd2.jpg)
+![config-picturesize](https://user-images.githubusercontent.com/6020549/99891839-ad1b1980-2cb1-11eb-94b7-832152fdb167.jpg)
 
 ## Select Shutter
 
 You can choose one of the following shutter methods
 
-![config-shutter-1](https://user-images.githubusercontent.com/6020549/66692107-381b9900-ecd6-11e9-8d73-1ee7423c5188.jpg)
-
 - Shutter is the Enter key on the keyboard   
 For operation check
 
-![config-shutter-2](https://user-images.githubusercontent.com/6020549/66692119-4964a580-ecd6-11e9-9695-bfd3d61dc20a.jpg)
+![config-shutter-1](https://user-images.githubusercontent.com/6020549/99891847-b73d1800-2cb1-11eb-84c0-2d6c6d85c010.jpg)
 
 - Shutter is a GPIO toggle
 
@@ -83,24 +87,43 @@ I confirmed that the following GPIO can be used.
 |GPIO15|OK|OK|
 |GPIO16|NG|NG|
 
-![config-shutter-3](https://user-images.githubusercontent.com/6020549/66692126-5b464880-ecd6-11e9-8823-e8a9a5fa1eed.jpg)
+![config-shutter-2](https://user-images.githubusercontent.com/6020549/99891859-c15f1680-2cb1-11eb-8204-2eced32c3d81.jpg)
 
 - Shutter is MQTT Publish   
 You can use pub.py.   
+Please change the following according to your environment.   
 
-![config-shutter-4](https://user-images.githubusercontent.com/6020549/66692137-6c8f5500-ecd6-11e9-90ef-b83981ea4809.jpg)
+```
+vi pub.py
+
+# MQTT Broker
+#host = '192.168.10.40'
+host = 'test.mosquitto.org'
+# MQTT Port
+port = 1883
+# MQTT Publish Topic
+topic = '/topic/picture/sub'
+
+pip install paho-mqtt
+
+python pub.py
+```
+
+![config-shutter-3](https://user-images.githubusercontent.com/6020549/99891865-d340b980-2cb1-11eb-9da5-944bd6a07c17.jpg)
 
 ## Flash Light
 
 ESP32-CAM by AI-Thinker have flash light on GPIO4.
 
-![config-flash](https://user-images.githubusercontent.com/6020549/66263918-5ac13400-e836-11e9-9511-7db58aa147b1.jpg)
+![config-flash](https://user-images.githubusercontent.com/6020549/99891870-e18ed580-2cb1-11eb-8e9a-6ed44633d4f2.jpg)
 
-# How to save picture file
+# How to save picture file using python   
 You can use saveFile.py.   
 Please change the following according to your environment.   
 
 ```
+vi saveFile.py
+
 # MQTT Broker
 #host = '192.168.10.40'
 host = 'test.mosquitto.org'
@@ -110,4 +133,8 @@ port = 1883
 topic = '/topic/picture/pub'
 # Save File
 saveFile = './output.jpg'
+
+pip install paho-mqtt
+
+python saveFile.py
 ```

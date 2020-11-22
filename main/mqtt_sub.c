@@ -27,7 +27,7 @@ extern int WIFI_CONNECTED_BIT;
 extern int MQTT_CONNECTED_BIT;
 
 extern QueueHandle_t xQueueCmd;
-extern QueueHandle_t xQueueSubscribe;
+QueueHandle_t xQueueSubscribe;
 
 static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
 {
@@ -93,6 +93,9 @@ void mqtt_sub(void *pvParameters)
 		.event_handle = mqtt_event_handler,
 		.client_id = "subscribe",
 	};
+
+	xQueueSubscribe = xQueueCreate( 10, sizeof(MQTT_t) );
+	configASSERT( xQueueSubscribe );
 
 	esp_mqtt_client_handle_t mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
 	xEventGroupClearBits(status_event_group, MQTT_CONNECTED_BIT);
