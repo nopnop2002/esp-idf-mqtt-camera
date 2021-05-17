@@ -130,3 +130,6 @@ topic = '/topic/picture/pub'
 # Save File
 saveFile = './output.jpg'
 ```
+
+# References   
+https://github.com/nopnop2002/esp-idf-mqtt-broker
