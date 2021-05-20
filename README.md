@@ -1,22 +1,20 @@
 # esp-idf-mqtt-camera
 Take a picture and Publish it via MQTT.   
+This project use [ESP32 Camera Driver](https://github.com/espressif/esp32-camera).
 
 ![スライド1](https://user-images.githubusercontent.com/6020549/99764072-90f76b00-2b3f-11eb-8cf1-a01b93e5309e.JPG)
-
 ![スライド2](https://user-images.githubusercontent.com/6020549/99764076-93f25b80-2b3f-11eb-915a-d1e39bb57295.JPG)
 
+# Hardware requirements
+ESP32-CAM Development board.   
+Support for OV2640 camera.   
+If you use other camera, edit sdkconfig.default.   
+![ESP32-CAM-1](https://user-images.githubusercontent.com/6020549/118466947-4fd2c300-b73e-11eb-8e64-23260e73e693.JPG)
+![ESP32-CAM-2](https://user-images.githubusercontent.com/6020549/118466960-53664a00-b73e-11eb-8950-a5058516e1a3.JPG)
+
 # Software requirements
-esp-idf v4.0.2-120.   
-git clone -b release/v4.0 --recursive https://github.com/espressif/esp-idf.git
-
-esp-idf v4.1-520.   
-git clone -b release/v4.1 --recursive https://github.com/espressif/esp-idf.git
-
-esp-idf v4.2-beta1-227.   
-git clone -b release/v4.2 --recursive https://github.com/espressif/esp-idf.git
-
-__It does not work with esp-idf v4.3.__
-__Even if I fix [this](https://github.com/espressif/esp-idf/pull/6029), I still get a panic.__
+esp-idf v4.4 or later.   
+The mDNS strict mode [issue](https://github.com/espressif/esp-idf/issues/6190) has been resolved.   
 
 # Installation
 Use a USB-TTL converter.   
@@ -45,8 +43,7 @@ Change GPIO0 to open and press the RESET button.
 Set the following items using menuconfig.
 
 ![config-main](https://user-images.githubusercontent.com/6020549/99891822-7f35d500-2cb1-11eb-928c-be9a8191dec9.jpg)
-
-![config-app](https://user-images.githubusercontent.com/6020549/99891825-852bb600-2cb1-11eb-8946-ab9ed2253390.jpg)
+![config-app](https://user-images.githubusercontent.com/6020549/119053256-ca326a00-ba00-11eb-9fcc-c520957c6592.jpg)
 
 ## Wifi Setting
 
@@ -54,15 +51,12 @@ Set the following items using menuconfig.
 
 ## MQTT Server Setting
 
-![config-mqtt](https://user-images.githubusercontent.com/6020549/99891829-95439580-2cb1-11eb-8aad-3f697fa0513b.jpg)
+![config-mqtt](https://user-images.githubusercontent.com/6020549/119053264-cc94c400-ba00-11eb-8ab3-844c1ba61e38.jpg)
 
-## Camera Pin
-
-![config-camerapin](https://user-images.githubusercontent.com/6020549/99891832-9ffe2a80-2cb1-11eb-8941-4b31ce900ea9.jpg)
-
-## Picture Size
-
-![config-picturesize](https://user-images.githubusercontent.com/6020549/99891839-ad1b1980-2cb1-11eb-94b7-832152fdb167.jpg)
+## Select Frame Size
+Large frame sizes take longer to take a picture.   
+![config-framesize-1](https://user-images.githubusercontent.com/6020549/118947689-8bfe6180-b992-11eb-8657-b4e86d3acc70.jpg)
+![config-framesize-2](https://user-images.githubusercontent.com/6020549/118947692-8d2f8e80-b992-11eb-9caa-1f6b6cb2210e.jpg)
 
 ## Select Shutter
 
@@ -133,3 +127,6 @@ saveFile = './output.jpg'
 
 # References   
 https://github.com/nopnop2002/esp-idf-mqtt-broker
+
+https://github.com/nopnop2002/esp-idf-mqtt-image-viewer
+
