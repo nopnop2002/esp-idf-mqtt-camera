@@ -14,7 +14,6 @@ If you use other camera, edit sdkconfig.default.
 
 # Software requirements
 esp-idf v4.4 or later.   
-The mDNS strict mode [issue](https://github.com/espressif/esp-idf/issues/6190) has been resolved.   
 
 # Installation
 Use a USB-TTL converter.   
