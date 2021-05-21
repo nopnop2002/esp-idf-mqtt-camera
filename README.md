@@ -92,8 +92,7 @@ Please change the following according to your environment.
 
 ```
 # MQTT Broker
-#host = '192.168.10.40'
-host = 'test.mosquitto.org'
+host = 'broker.emqx.io'
 # MQTT Port
 port = 1883
 # MQTT Publish Topic
