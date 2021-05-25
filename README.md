@@ -30,9 +30,10 @@ Use a USB-TTL converter.
 ```
 git clone https://github.com/nopnop2002/esp-idf-mqtt-camera
 cd esp-idf-mqtt-camera
-git clone https://github.com/espressif/esp32-camera components
-make menuconfig
-make flash monitor
+git clone https://github.com/espressif/esp32-camera components/esp32-camera
+idf.py set-target esp32
+idf.py menuconfig
+idf.py flash monitor
 ```
 
 # Start firmware
