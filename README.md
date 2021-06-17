@@ -55,8 +55,8 @@ Set the following items using menuconfig.
 
 ## Select Frame Size
 Large frame sizes take longer to take a picture.   
-![config-framesize-1](https://user-images.githubusercontent.com/6020549/118947689-8bfe6180-b992-11eb-8657-b4e86d3acc70.jpg)
-![config-framesize-2](https://user-images.githubusercontent.com/6020549/118947692-8d2f8e80-b992-11eb-9caa-1f6b6cb2210e.jpg)
+![config-framesize-1](https://user-images.githubusercontent.com/6020549/122478692-d233f880-d004-11eb-8176-cd4d750d1ed9.jpg)
+![config-framesize-2](https://user-images.githubusercontent.com/6020549/122478707-d9f39d00-d004-11eb-9e55-70f4db369b41.jpg)
 
 ## Select Shutter
 
