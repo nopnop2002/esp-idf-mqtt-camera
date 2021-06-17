@@ -55,6 +55,7 @@ Set the following items using menuconfig.
 
 ## Select Frame Size
 Large frame sizes take longer to take a picture.   
+
 ![config-framesize-1](https://user-images.githubusercontent.com/6020549/122478692-d233f880-d004-11eb-8176-cd4d750d1ed9.jpg)
 ![config-framesize-2](https://user-images.githubusercontent.com/6020549/122478707-d9f39d00-d004-11eb-9e55-70f4db369b41.jpg)
 
@@ -104,9 +105,9 @@ topic = '/topic/picture/sub'
 
 ## Flash Light
 
-ESP32-CAM by AI-Thinker have flash light on GPIO4.
+ESP32-CAM by AI-Thinker have flash light on GPIO4.   
 
-![config-flash](https://user-images.githubusercontent.com/6020549/99891870-e18ed580-2cb1-11eb-8e9a-6ed44633d4f2.jpg)
+![config-flash](https://user-images.githubusercontent.com/6020549/122479023-6b630f00-d005-11eb-98cc-b5fdbf2987c7.jpg)
 
 # How to save picture file using python   
 You can use saveFile.py.   
