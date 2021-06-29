@@ -2,8 +2,8 @@
 Take a picture and Publish it via MQTT.   
 This project use [ESP32 Camera Driver](https://github.com/espressif/esp32-camera).
 
-![スライド1](https://user-images.githubusercontent.com/6020549/99764072-90f76b00-2b3f-11eb-8cf1-a01b93e5309e.JPG)
-![スライド2](https://user-images.githubusercontent.com/6020549/99764076-93f25b80-2b3f-11eb-915a-d1e39bb57295.JPG)
+![slide0001](https://user-images.githubusercontent.com/6020549/123804185-f73f3a00-d927-11eb-9bf8-918595583c1a.jpg)
+![slide0002](https://user-images.githubusercontent.com/6020549/123804188-f8706700-d927-11eb-83ed-65d3aaf2a335.jpg)
 
 # Hardware requirements
 ESP32-CAM Development board.   
