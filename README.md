@@ -124,6 +124,10 @@ topic = 'image/#'
 saveFile = './output.jpg'
 ```
 
+# MQTT client Example
+Example code in various languages.   
+https://github.com/emqx/MQTT-Client-Examples
+
 # References   
 https://github.com/nopnop2002/esp-idf-mqtt-broker
 
