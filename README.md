@@ -124,7 +124,7 @@ topic = 'image/#'
 saveFile = './output.jpg'
 ```
 
-## Built-in WEB Server
+# Built-in WEB Server
 You can check the photos taken using the built-in WEB server.   
 Enter the ESP32's IP address and port number in the address bar of your browser.   
 
