@@ -124,9 +124,16 @@ topic = 'image/#'
 saveFile = './output.jpg'
 ```
 
+## Built-in WEB Server
+You can check the photos taken using the built-in WEB server.   
+Enter the ESP32's IP address and port number in the address bar of your browser.   
+
+![browser](https://user-images.githubusercontent.com/6020549/124227364-837a7880-db45-11eb-9d8b-fa15c676adac.jpg)
+
 # MQTT client Example
 Example code in various languages.   
 https://github.com/emqx/MQTT-Client-Examples
+
 
 # References   
 https://github.com/nopnop2002/esp-idf-mqtt-broker

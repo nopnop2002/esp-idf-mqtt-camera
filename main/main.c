@@ -19,12 +19,14 @@
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "nvs_flash.h"
+#include "esp_spiffs.h" 
 #include "esp_sntp.h"
 #include "mqtt_client.h"
 
 #include "esp_camera.h"
 
 #include "cmd.h"
+#include "http.h"
 
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t s_wifi_event_group;
@@ -43,6 +45,7 @@ static const char *TAG = "MAIN";
 static int s_retry_num = 0;
 
 QueueHandle_t xQueueCmd;
+QueueHandle_t xQueueHttp;
 
 #define BOARD_ESP32CAM_AITHINKER
 
@@ -271,6 +274,42 @@ esp_err_t wifi_init_sta(void)
 	return ret;
 }
 
+esp_err_t mountSPIFFS(char * partition_label, char * base_path) {
+	ESP_LOGI(TAG, "Initializing SPIFFS file system");
+
+	esp_vfs_spiffs_conf_t conf = {
+		.base_path = base_path,
+		.partition_label = partition_label,
+		.max_files = 5,
+		.format_if_mount_failed = true
+	};
+
+	// Use settings defined above to initialize and mount SPIFFS filesystem.
+	// Note: esp_vfs_spiffs_register is an all-in-one convenience function.
+	esp_err_t ret = esp_vfs_spiffs_register(&conf);
+
+	if (ret != ESP_OK) {
+		if (ret == ESP_FAIL) {
+			ESP_LOGE(TAG, "Failed to mount or format filesystem");
+		} else if (ret == ESP_ERR_NOT_FOUND) {
+			ESP_LOGE(TAG, "Failed to find SPIFFS partition");
+		} else {
+			ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(ret));
+		}
+		return ret;
+	}
+
+	size_t total = 0, used = 0;
+	ret = esp_spiffs_info(partition_label, &total, &used);
+	if (ret != ESP_OK) {
+		ESP_LOGE(TAG, "Failed to get SPIFFS partition information (%s)", esp_err_to_name(ret));
+	} else {
+		ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
+	}
+	ESP_LOGI(TAG, "Mount SPIFFS filesystem");
+	return ret;
+}
+
 
 void mqtt_pub(void *pvParameters);
 
@@ -286,6 +325,7 @@ void gpio(void *pvParameters);
 void mqtt_sub(void *pvParameters);
 #endif
 
+void http_task(void *pvParameters);
 
 void app_main(void)
 {
@@ -300,9 +340,15 @@ void app_main(void)
 	ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
 	if (wifi_init_sta() != ESP_OK) {
 		ESP_LOGE(TAG, "wifi_init_sta fail");
-		while(1) {
-			vTaskDelay(1);
-		}
+		while(1) { vTaskDelay(1); }
+	}
+
+	char *partition_label = "storage";
+	char *base_path = "/spiffs"; 
+	ret = mountSPIFFS(partition_label, base_path);
+	if (ret != ESP_OK) {
+		ESP_LOGE(TAG, "mountSPIFFS fail");
+		while(1) { vTaskDelay(1); }
 	}
 
 
@@ -316,6 +362,8 @@ void app_main(void)
 	/* Create Queue */
 	xQueueCmd = xQueueCreate( 10, sizeof(CMD_t) );
 	configASSERT( xQueueCmd );
+	xQueueHttp = xQueueCreate( 10, sizeof(HTTP_t) );
+	configASSERT( xQueueHttp );
 
 	/* Create Shutter Task */
 #if CONFIG_SHUTTER_ENTER
@@ -332,6 +380,15 @@ void app_main(void)
 #define SHUTTER "MQTT Input"
 	xTaskCreate(mqtt_sub, "SUB", 1024*4, NULL, 2, NULL);
 #endif
+
+	/* Get the local IP address */
+	tcpip_adapter_ip_info_t ip_info;
+	ESP_ERROR_CHECK(tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info));
+
+	/* Create HTTP Task */
+	char cparam0[64];
+	sprintf(cparam0, "%s", ip4addr_ntoa(&ip_info.ip));
+	xTaskCreate(http_task, "HTTP", 1024*6, (void *)cparam0, 2, NULL);
 
 	s_mqtt_event_group = xEventGroupCreate();
 	esp_mqtt_client_config_t mqtt_cfg = {
@@ -370,8 +427,15 @@ void app_main(void)
 	#define	FRAMESIZE_STRING "1600x1200"
 #endif
 
-	init_camera(framesize);
+	ret = init_camera(framesize);
+	if (ret != ESP_OK) {
+		while(1) { vTaskDelay(1); }
+	}
 	
+	HTTP_t httpBuf;
+	httpBuf.taskHandle = xTaskGetCurrentTaskHandle();
+	strcpy(httpBuf.localFileName, "/spiffs/picture.jpg");
+
 	CMD_t cmdBuf;
 
 	while (1) {
@@ -389,9 +453,28 @@ void app_main(void)
 			gpio_set_level(CONFIG_GPIO_FLASH, 1);
 #endif
 
+			// Clear internal queue
+			//for(int i=0;i<2;i++) {
+			for(int i=0;i<1;i++) {
+				camera_fb_t * fb = esp_camera_fb_get();
+				ESP_LOGI(TAG, "fb->len=%d", fb->len);
+				esp_camera_fb_return(fb);
+			}
+
 			// Capture frame
 			camera_fb_t * fb = esp_camera_fb_get();
 			if (fb) {
+
+				// Save image to local file
+				FILE* f = fopen(httpBuf.localFileName, "wb");
+				if (f == NULL) {
+					ESP_LOGE(TAG, "Failed to open file for writing");
+				} else {
+					fwrite(fb->buf, fb->len, 1, f);
+					ESP_LOGI(TAG, "fb->len=%d", fb->len);
+					fclose(f);
+				}
+
 				ESP_LOGI(TAG, "Captured with %s", FRAMESIZE_STRING);
 				//int msg_id = esp_mqtt_client_publish(mqtt_client, CONFIG_PUB_TOPIC, "test", 0, 1, 0);
 				int msg_id = esp_mqtt_client_publish(mqtt_client, CONFIG_PUB_TOPIC, (char *)fb->buf, fb->len, 1, 0);
@@ -399,6 +482,9 @@ void app_main(void)
 					ESP_LOGE(TAG, "esp_mqtt_client_publish fail");
 				} else {
 					ESP_LOGI(TAG, "sent publish successful, msg_id=%d fb->len=%d", msg_id, fb->len);
+					if (xQueueSend(xQueueHttp, &httpBuf, 10) != pdPASS) {
+						ESP_LOGE(TAG, "xQueueSend xQueueHttp fail");
+					}
 				}
 
 				//return the frame buffer back to the driver for reuse
