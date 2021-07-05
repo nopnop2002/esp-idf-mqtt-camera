@@ -124,6 +124,21 @@ topic = 'image/#'
 saveFile = './output.jpg'
 ```
 
+# How to save picture file using node.js   
+You can use saveFile.js.   
+Please change the following according to your environment.   
+
+```
+// MQTT Broker
+host = 'mqtt://broker.emqx.io'
+// MQTT Subscribe Topic
+topic = 'image/#';
+// Save File
+saveFile = './output.jpg'
+```
+
+
+
 # Built-in WEB Server
 You can check the photos taken using the built-in WEB server.   
 Enter the ESP32's IP address and port number in the address bar of your browser.   
