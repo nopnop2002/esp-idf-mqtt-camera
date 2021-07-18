@@ -116,8 +116,6 @@ Please change the following according to your environment.
 ```
 # MQTT Broker
 host = 'broker.emqx.io'
-# MQTT Port
-port = 1883
 # MQTT Subscribe Topic
 topic = 'image/#'
 # Save File
