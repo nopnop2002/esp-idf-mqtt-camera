@@ -130,7 +130,5 @@ menu "Application Configuration"
 			GPIO number (IOxx) to Button Input.
 			Some GPIOs are used for other purposes (flash connections, etc.) and cannot be used to Button.
 
-
-
 endmenu
 

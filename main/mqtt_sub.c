@@ -22,12 +22,12 @@
 
 static const char *TAG = "SUB";
 
-extern EventGroupHandle_t status_event_group;
 extern int WIFI_CONNECTED_BIT;
 extern int MQTT_CONNECTED_BIT;
 
 extern QueueHandle_t xQueueCmd;
 QueueHandle_t xQueueSubscribe;
+EventGroupHandle_t xEventGroupHandle;
 
 static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
 {
@@ -37,12 +37,12 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
 	switch (event->event_id) {
 		case MQTT_EVENT_CONNECTED:
 			ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-			xEventGroupSetBits(status_event_group, MQTT_CONNECTED_BIT);
+			xEventGroupSetBits(xEventGroupHandle, MQTT_CONNECTED_BIT);
 			esp_mqtt_client_subscribe(mqtt_client, CONFIG_SUB_TOPIC, 0);
 			break;
 		case MQTT_EVENT_DISCONNECTED:
 			ESP_LOGW(TAG, "MQTT_EVENT_DISCONNECTED");
-			xEventGroupClearBits(status_event_group, MQTT_CONNECTED_BIT);
+			xEventGroupClearBits(xEventGroupHandle, MQTT_CONNECTED_BIT);
 			break;
 		case MQTT_EVENT_SUBSCRIBED:
 			ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
@@ -94,13 +94,18 @@ void mqtt_sub(void *pvParameters)
 		.client_id = "subscribe",
 	};
 
+	/* Create Queue */
 	xQueueSubscribe = xQueueCreate( 10, sizeof(MQTT_t) );
 	configASSERT( xQueueSubscribe );
 
+	/* Create Eventgroup */
+	xEventGroupHandle = xEventGroupCreate();
+	configASSERT( xEventGroupHandle );
+
 	esp_mqtt_client_handle_t mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
-	xEventGroupClearBits(status_event_group, MQTT_CONNECTED_BIT);
+	xEventGroupClearBits(xEventGroupHandle, MQTT_CONNECTED_BIT);
 	esp_mqtt_client_start(mqtt_client);
-	xEventGroupWaitBits(status_event_group, MQTT_CONNECTED_BIT, false, true, portMAX_DELAY);
+	xEventGroupWaitBits(xEventGroupHandle, MQTT_CONNECTED_BIT, false, true, portMAX_DELAY);
 	ESP_LOGI(TAG, "Connect to MQTT Server");
 
 	//esp_mqtt_client_subscribe(mqtt_client, CONFIG_SUB_TOPIC, 0);
