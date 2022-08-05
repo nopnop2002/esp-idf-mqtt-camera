@@ -100,7 +100,10 @@ I confirmed that the following GPIO can be used.
 ![config-shutter-2](https://user-images.githubusercontent.com/6020549/99891859-c15f1680-2cb1-11eb-8204-2eced32c3d81.jpg)
 
 - Shutter is MQTT Publish   
-You can use pub.py.   
+
+![config-shutter-3](https://user-images.githubusercontent.com/6020549/99891865-d340b980-2cb1-11eb-9da5-944bd6a07c17.jpg)
+
+You can use pub.py as shutter.   
 Change the following according to your environment.   
 
 ```
@@ -119,8 +122,6 @@ $ python3 -m pip install paho-mqtt
 $ python3 pub.py
 ```
 
-
-![config-shutter-3](https://user-images.githubusercontent.com/6020549/99891865-d340b980-2cb1-11eb-9da5-944bd6a07c17.jpg)
 
 ## Flash Light
 
