@@ -21,6 +21,8 @@
 #include "nvs_flash.h"
 #include "esp_spiffs.h" 
 #include "esp_sntp.h"
+#include "mdns.h"
+#include "lwip/dns.h"
 #include "mqtt_client.h"
 
 #include "esp_camera.h"
@@ -197,48 +199,66 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
 	return ESP_OK;
 }
 
-esp_err_t wifi_init_sta(void)
+void wifi_init_sta()
 {
 	s_wifi_event_group = xEventGroupCreate();
 
+	ESP_LOGI(TAG,"ESP-IDF esp_netif");
 	ESP_ERROR_CHECK(esp_netif_init());
-
 	ESP_ERROR_CHECK(esp_event_loop_create_default());
-	esp_netif_create_default_wifi_sta();
+	esp_netif_t *netif = esp_netif_create_default_wifi_sta();
+	assert(netif);
+
+#if CONFIG_STATIC_IP
+
+	ESP_LOGI(TAG, "CONFIG_STATIC_IP_ADDRESS=[%s]",CONFIG_STATIC_IP_ADDRESS);
+	ESP_LOGI(TAG, "CONFIG_STATIC_GW_ADDRESS=[%s]",CONFIG_STATIC_GW_ADDRESS);
+	ESP_LOGI(TAG, "CONFIG_STATIC_NM_ADDRESS=[%s]",CONFIG_STATIC_NM_ADDRESS);
+
+	/* Stop DHCP client */
+	ESP_ERROR_CHECK(esp_netif_dhcpc_stop(netif));
+	ESP_LOGI(TAG, "Stop DHCP Services");
+
+	/* Set STATIC IP Address */
+	esp_netif_ip_info_t ip_info;
+	memset(&ip_info, 0 , sizeof(esp_netif_ip_info_t));
+	ip_info.ip.addr = ipaddr_addr(CONFIG_STATIC_IP_ADDRESS);
+	ip_info.netmask.addr = ipaddr_addr(CONFIG_STATIC_NM_ADDRESS);
+	ip_info.gw.addr = ipaddr_addr(CONFIG_STATIC_GW_ADDRESS);;
+	esp_netif_set_ip_info(netif, &ip_info);
+
+	/*
+	I referred from here.
+	https://www.esp32.com/viewtopic.php?t=5380
+
+	if we should not be using DHCP (for example we are using static IP addresses),
+	then we need to instruct the ESP32 of the locations of the DNS servers manually.
+	Google publicly makes available two name servers with the addresses of 8.8.8.8 and 8.8.4.4.
+	*/
+
+	ip_addr_t d;
+	d.type = IPADDR_TYPE_V4;
+	d.u_addr.ip4.addr = 0x08080808; //8.8.8.8 dns
+	dns_setserver(0, &d);
+	d.u_addr.ip4.addr = 0x08080404; //8.8.4.4 dns
+	dns_setserver(1, &d);
+
+#endif // CONFIG_STATIC_IP
 
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 	ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
-	esp_event_handler_instance_t instance_any_id;
-	esp_event_handler_instance_t instance_got_ip;
-	ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT,
-														ESP_EVENT_ANY_ID,
-														&event_handler,
-														NULL,
-														&instance_any_id));
-	ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT,
-														IP_EVENT_STA_GOT_IP,
-														&event_handler,
-														NULL,
-														&instance_got_ip));
+	ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
+	ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler, NULL));
 
 	wifi_config_t wifi_config = {
 		.sta = {
 			.ssid = CONFIG_ESP_WIFI_SSID,
-			.password = CONFIG_ESP_WIFI_PASSWORD,
-			/* Setting a password implies station will connect to all security modes including WEP/WPA.
-			 * However these modes are deprecated and not advisable to be used. Incase your Access point
-			 * doesn't support WPA2, these mode can be enabled by commenting below line */
-		 .threshold.authmode = WIFI_AUTH_WPA2_PSK,
-
-			.pmf_cfg = {
-				.capable = true,
-				.required = false
-			},
+			.password = CONFIG_ESP_WIFI_PASSWORD
 		},
 	};
 	ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA) );
-	ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config) );
+	ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config) );
 	ESP_ERROR_CHECK(esp_wifi_start() );
 
 	ESP_LOGI(TAG, "wifi_init_sta finished.");
@@ -251,27 +271,32 @@ esp_err_t wifi_init_sta(void)
 			pdFALSE,
 			portMAX_DELAY);
 
-	esp_err_t ret;
 	/* xEventGroupWaitBits() returns the bits before the call returned, hence we can test which event actually
 	 * happened. */
 	if (bits & WIFI_CONNECTED_BIT) {
 		ESP_LOGI(TAG, "connected to ap SSID:%s password:%s",
 				 CONFIG_ESP_WIFI_SSID, CONFIG_ESP_WIFI_PASSWORD);
-		ret = ESP_OK;
 	} else if (bits & WIFI_FAIL_BIT) {
 		ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s",
 				 CONFIG_ESP_WIFI_SSID, CONFIG_ESP_WIFI_PASSWORD);
-		ret = ESP_FAIL;
 	} else {
 		ESP_LOGE(TAG, "UNEXPECTED EVENT");
-		ret = ESP_FAIL;
 	}
-
-	/* The event will not be processed after unregister */
-	ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, instance_got_ip));
-	ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, instance_any_id));
 	vEventGroupDelete(s_wifi_event_group);
-	return ret;
+}
+
+void initialise_mdns(void)
+{
+    //initialize mDNS
+    ESP_ERROR_CHECK( mdns_init() );
+    //set mDNS hostname (required if you want to advertise services)
+    ESP_ERROR_CHECK( mdns_hostname_set(CONFIG_MDNS_HOSTNAME) );
+    ESP_LOGI(TAG, "mdns hostname set to: [%s]", CONFIG_MDNS_HOSTNAME);
+
+#if 0
+    //set default mDNS instance name
+    ESP_ERROR_CHECK( mdns_instance_name_set("ESP32 with mDNS") );
+#endif
 }
 
 esp_err_t mountSPIFFS(char * partition_label, char * base_path) {
@@ -311,7 +336,7 @@ esp_err_t mountSPIFFS(char * partition_label, char * base_path) {
 }
 
 
-void mqtt_pub(void *pvParameters);
+//void mqtt_pub(void *pvParameters);
 
 #if CONFIG_SHUTTER_ENTER
 void keyin(void *pvParameters);
@@ -338,10 +363,8 @@ void app_main(void)
 	ESP_ERROR_CHECK(ret);
 
 	ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
-	if (wifi_init_sta() != ESP_OK) {
-		ESP_LOGE(TAG, "wifi_init_sta fail");
-		while(1) { vTaskDelay(1); }
-	}
+	wifi_init_sta();
+	initialise_mdns();
 
 	char *partition_label = "storage";
 	char *base_path = "/spiffs"; 
@@ -354,7 +377,8 @@ void app_main(void)
 
 #if CONFIG_ENABLE_FLASH
 	// Enable Flash Light
-	gpio_pad_select_gpio(CONFIG_GPIO_FLASH);
+	//gpio_pad_select_gpio(CONFIG_GPIO_FLASH);
+	gpio_reset_pin(CONFIG_GPIO_FLASH);
 	gpio_set_direction(CONFIG_GPIO_FLASH, GPIO_MODE_OUTPUT);
 	gpio_set_level(CONFIG_GPIO_FLASH, 0);
 #endif
@@ -382,12 +406,15 @@ void app_main(void)
 #endif
 
 	/* Get the local IP address */
-	tcpip_adapter_ip_info_t ip_info;
-	ESP_ERROR_CHECK(tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info));
+	//tcpip_adapter_ip_info_t ip_info;
+	//ESP_ERROR_CHECK(tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info));
+	esp_netif_ip_info_t ip_info;
+	ESP_ERROR_CHECK(esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ip_info));
 
 	/* Create HTTP Task */
 	char cparam0[64];
-	sprintf(cparam0, "%s", ip4addr_ntoa(&ip_info.ip));
+	//sprintf(cparam0, "%s", ip4addr_ntoa(&ip_info.ip));
+	sprintf(cparam0, IPSTR, IP2STR(&ip_info.ip));
 	xTaskCreate(http_task, "HTTP", 1024*6, (void *)cparam0, 2, NULL);
 
 	s_mqtt_event_group = xEventGroupCreate();
@@ -475,11 +502,11 @@ void app_main(void)
 					fclose(f);
 				}
 
-				ESP_LOGI(TAG, "Captured with %s", FRAMESIZE_STRING);
+				ESP_LOGI(TAG, "Captured with %s. fb->len=%d", FRAMESIZE_STRING, fb->len);
 				//int msg_id = esp_mqtt_client_publish(mqtt_client, CONFIG_PUB_TOPIC, "test", 0, 1, 0);
 				int msg_id = esp_mqtt_client_publish(mqtt_client, CONFIG_PUB_TOPIC, (char *)fb->buf, fb->len, 1, 0);
 				if (msg_id < 0) {
-					ESP_LOGE(TAG, "esp_mqtt_client_publish fail");
+					ESP_LOGE(TAG, "esp_mqtt_client_publish fail. msg_id=%d", msg_id);
 				} else {
 					ESP_LOGI(TAG, "sent publish successful, msg_id=%d fb->len=%d", msg_id, fb->len);
 					if (xQueueSend(xQueueHttp, &httpBuf, 10) != pdPASS) {

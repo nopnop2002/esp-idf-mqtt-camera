@@ -1,7 +1,11 @@
+// Software requirement
+// npm install mqtt
+
 // MQTT Broker
-host = 'mqtt://broker.emqx.io'
+host = 'mqtt://your_broker'
+//host = 'mqtt://192.168.10.40'
 // MQTT Subscribe Topic
-topic = 'image/#';
+topic = '/image/#';
 // Save File
 saveFile = './output.jpg'
 
@@ -10,11 +14,11 @@ const client = require('mqtt').connect(host);
 
 // Message reception handler
 client.on('message', (topic, message) => {
-  console.log(topic);
+  console.log("receive topic is %s", topic);
   const fs = require("fs");
   fs.writeFile(saveFile, message, (err) => {
     if (err) throw err;
-    console.log('Writing completed successfully');
+    console.log('file %s (%d bytes) write successfully', saveFile, message.length);
   });
 });
 

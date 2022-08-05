@@ -47,11 +47,22 @@ Set the following items using menuconfig.
 
 ## Wifi Setting
 
-![config-wifi](https://user-images.githubusercontent.com/6020549/99891826-8ceb5a80-2cb1-11eb-8470-f5ceb9e4576a.jpg)
+![config-wifi-1](https://user-images.githubusercontent.com/6020549/182987385-b885f6d2-f52a-4fc3-a338-c089547703a1.jpg)
+
+You can use the mDNS hostname instead of the IP address.   
+- esp-idf V4.3 or earlier   
+ You will need to manually change the mDNS strict mode according to [this](https://github.com/espressif/esp-idf/issues/6190) instruction.   
+- esp-idf V4.4 or later  
+ If you set CONFIG_MDNS_STRICT_MODE = y in sdkconfig.default, the firmware will be built with MDNS_STRICT_MODE = 1.
+
+![config-wifi-2](https://user-images.githubusercontent.com/6020549/182987378-4074dc87-05b6-4102-baf9-c0428eb54321.jpg)
+
+You can use static IP.   
+![config-wifi-3](https://user-images.githubusercontent.com/6020549/182987383-74bc02d7-678f-4aa3-87b1-41d3e99f279e.jpg)
 
 ## MQTT Server Setting
 
-![config-mqtt](https://user-images.githubusercontent.com/6020549/119053264-cc94c400-ba00-11eb-8ab3-844c1ba61e38.jpg)
+![config-mqtt](https://user-images.githubusercontent.com/6020549/182986503-3bd24cf6-574e-488b-bd8b-07ae1ba0a522.jpg)
 
 ## Select Frame Size
 Large frame sizes take longer to take a picture.   
@@ -90,16 +101,24 @@ I confirmed that the following GPIO can be used.
 
 - Shutter is MQTT Publish   
 You can use pub.py.   
-Please change the following according to your environment.   
+Change the following according to your environment.   
 
 ```
 # MQTT Broker
-host = 'broker.emqx.io'
+host = 'your_broker'
 # MQTT Port
 port = 1883
 # MQTT Publish Topic
 topic = '/topic/picture/sub'
 ```
+
+Requires mqtt library.   
+```
+$ python3 -m pip install -U wheel
+$ python3 -m pip install paho-mqtt
+$ python3 pub.py
+```
+
 
 ![config-shutter-3](https://user-images.githubusercontent.com/6020549/99891865-d340b980-2cb1-11eb-9da5-944bd6a07c17.jpg)
 
@@ -111,30 +130,43 @@ ESP32-CAM by AI-Thinker have flash light on GPIO4.
 
 # How to save picture file using python   
 You can use saveFile.py.   
-Please change the following according to your environment.   
+Change the following according to your environment.   
 
 ```
 # MQTT Broker
-host = 'broker.emqx.io'
+host = 'your_broker'
 # MQTT Subscribe Topic
-topic = 'image/#'
+topic = '/image/#'
 # Save File
 saveFile = './output.jpg'
 ```
 
+Requires mqtt library.   
+```
+$ python3 -m pip install -U wheel
+$ python3 -m pip install paho-mqtt
+$ python3 saveFile.py
+```
+
+
 # How to save picture file using node.js   
 You can use saveFile.js.   
-Please change the following according to your environment.   
+Change the following according to your environment.   
 
 ```
 // MQTT Broker
-host = 'mqtt://broker.emqx.io'
+host = 'mqtt://your_broker'
 // MQTT Subscribe Topic
-topic = 'image/#';
+topic = '/image/#';
 // Save File
 saveFile = './output.jpg'
 ```
 
+Requires mqtt library.   
+```
+$ npm install mqtt
+$ npm saveFile.js
+```
 
 
 # Built-in WEB Server

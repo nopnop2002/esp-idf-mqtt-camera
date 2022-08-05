@@ -3,7 +3,8 @@
 import paho.mqtt.client as mqtt
 
 # MQTT Broker
-host = 'broker.emqx.io'
+host = 'your_broker'
+#host = '192.168.10.40'
 # MQTT Port
 port = 1883
 # MQTT Publish Topic

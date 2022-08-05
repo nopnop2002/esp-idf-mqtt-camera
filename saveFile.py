@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#python3 -m pip install -U wheel
+#python3 -m pip install paho-mqtt
 import paho.mqtt.client as mqtt
 
+
 # MQTT Broker
-host = 'broker.emqx.io'
+host = 'your_broker'
+#host = '192.168.10.40'
 # MQTT Port
 port = 1883
 # MQTT Subscribe Topic
-topic = 'image/#'
+topic = '/image/#'
 # Save File
 saveFile = './output.jpg'
 
@@ -20,7 +24,8 @@ def on_message(client, userdata, msg):
 	outfile = open(saveFile, 'wb')
 	outfile.write(msg.payload)
 	outfile.close
-	print('file {} create'.format(saveFile))
+	print('receive topic is {}'.format(msg.topic))
+	print('file {} ({} bytes) write successfully'.format(saveFile, len(msg.payload)))
 
 if __name__=='__main__':
 	client = mqtt.Client(protocol=mqtt.MQTTv311)
