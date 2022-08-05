@@ -130,7 +130,7 @@ ESP32-CAM by AI-Thinker have flash light on GPIO4.
 ![config-flash](https://user-images.githubusercontent.com/6020549/122479023-6b630f00-d005-11eb-98cc-b5fdbf2987c7.jpg)
 
 # How to save picture file using python   
-You can use saveFile.py.   
+You can use saveFile.py to save picture.   
 Change the following according to your environment.   
 
 ```
@@ -151,7 +151,7 @@ $ python3 saveFile.py
 
 
 # How to save picture file using node.js   
-You can use saveFile.js.   
+You can use saveFile.js to save picture.   
 Change the following according to your environment.   
 
 ```
