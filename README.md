@@ -122,6 +122,12 @@ $ python3 -m pip install paho-mqtt
 $ python3 pub.py
 ```
 
+You can use mosquitto_pub as shutter.   
+
+```
+$ mosquitto_pub -h your_broker -p 1883 -t "/topic/picture/sub" -m ""
+```
+
 
 ## Flash Light
 
