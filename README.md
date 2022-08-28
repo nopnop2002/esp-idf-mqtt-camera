@@ -135,8 +135,8 @@ ESP32-CAM by AI-Thinker have flash light on GPIO4.
 
 ![config-flash](https://user-images.githubusercontent.com/6020549/122479023-6b630f00-d005-11eb-98cc-b5fdbf2987c7.jpg)
 
-# Save picture using python   
-You can use saveFile.py to save picture.   
+# Save pictures using python   
+You can use saveFile.py to save pictures.   
 Change the following according to your environment.   
 
 ```
@@ -156,8 +156,8 @@ $ python3 saveFile.py
 ```
 
 
-# Save picture using node.js   
-You can use saveFile.js to save picture.   
+# Save pictures using node.js   
+You can use saveFile.js to save pictures.   
 Change the following according to your environment.   
 
 ```
@@ -175,7 +175,7 @@ $ npm install mqtt
 $ npm saveFile.js
 ```
 
-# Save & view picture using flask
+# Take & view pictures using flask
 Read [this](https://github.com/nopnop2002/esp-idf-mqtt-camera/tree/master/flask).   
 
 # Built-in WEB Server
