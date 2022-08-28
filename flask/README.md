@@ -22,6 +22,8 @@ python3 mqtt-client.py --help
 ```
 
 ![flask-1](https://user-images.githubusercontent.com/6020549/187065193-1749fb4c-adec-4acc-b4cb-cf2223a37bdb.jpg)
+
+Start application with broker.   
 ![flask-2](https://user-images.githubusercontent.com/6020549/187065194-de78ae81-fe9e-4b17-8b8f-a00e73cfc1fa.jpg)
 
 
