@@ -1,4 +1,5 @@
-# View picture using flask
+# Take & View pictures using flask
+You can take & view pictures using WEB interface.   
 
 ![slide3](https://user-images.githubusercontent.com/6020549/187050703-8df7abac-a3b7-4272-b412-ad2455f75e96.JPG)
 
@@ -17,11 +18,11 @@ python3 -m pip install -U flask-mqtt
 ```
 git clone https://github.com/nopnop2002/esp-idf-mqtt-camera
 cd esp-idf-mqtt-camera/flask
-python3 mqtt.py --broker your_broker
+python3 mqtt-client.py --help
 ```
 
-![flask-1](https://user-images.githubusercontent.com/6020549/187050721-f6df2b73-229d-49ff-9521-28bffcfdafc7.jpg)
-![flask-2](https://user-images.githubusercontent.com/6020549/187050723-e6b25085-be47-4a49-80d4-c6d971d5948c.jpg)
+![flask-1](https://user-images.githubusercontent.com/6020549/187065193-1749fb4c-adec-4acc-b4cb-cf2223a37bdb.jpg)
+![flask-2](https://user-images.githubusercontent.com/6020549/187065194-de78ae81-fe9e-4b17-8b8f-a00e73cfc1fa.jpg)
 
 
 # Take picture
