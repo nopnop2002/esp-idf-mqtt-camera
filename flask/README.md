@@ -30,6 +30,8 @@ Start application with broker.
 # Take picture
 ESP32 shutter is configured with mqtt subscribe.   
 ![flask-11](https://user-images.githubusercontent.com/6020549/187050741-bd27e1e5-cee1-46c8-98f2-bd9cc91dbf88.jpg)
+
+Refresh web page.   
 ![flask-12](https://user-images.githubusercontent.com/6020549/187050744-c2da31c2-7e46-4996-aa6a-afa5e33c1377.jpg)
 ![flask-13](https://user-images.githubusercontent.com/6020549/187050745-a4ee65c8-2b0c-476b-8ea3-9c57af66c3d8.jpg)
 
