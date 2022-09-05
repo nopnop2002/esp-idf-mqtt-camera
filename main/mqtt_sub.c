@@ -5,14 +5,12 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include <stddef.h>
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "freertos/queue.h"
-#include "freertos/event_groups.h"
 #include "esp_log.h"
 #include "esp_event.h"
+#include "esp_mac.h"
 #include "mqtt_client.h"
 
 #include "cmd.h"
@@ -26,23 +24,34 @@ extern int WIFI_CONNECTED_BIT;
 extern int MQTT_CONNECTED_BIT;
 
 extern QueueHandle_t xQueueCmd;
-QueueHandle_t xQueueSubscribe;
-EventGroupHandle_t xEventGroupHandle;
 
-static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
+/*
+ * @brief Event handler registered to receive MQTT events
+ *
+ *	This function is called by the MQTT client event loop.
+ *
+ * @param handler_args user data registered to the event.
+ * @param base Event base for the handler(always MQTT Base in this example).
+ * @param event_id The id for the received event.
+ * @param event_data The data for the event, esp_mqtt_event_handle_t.
+ */
+static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
-	// your_context_t *context = event->context;
-	esp_mqtt_client_handle_t mqtt_client = event->client;
+	ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
+	esp_mqtt_event_handle_t event = event_data;
 
-	switch (event->event_id) {
+	MQTT_t *mqttBuf = event->user_context;
+	ESP_LOGI(TAG, "taskHandle=%x", mqttBuf->taskHandle);
+	mqttBuf->event_id = event_id;
+	switch ((esp_mqtt_event_id_t)event_id) {
 		case MQTT_EVENT_CONNECTED:
 			ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-			xEventGroupSetBits(xEventGroupHandle, MQTT_CONNECTED_BIT);
-			esp_mqtt_client_subscribe(mqtt_client, CONFIG_SUB_TOPIC, 0);
+			xTaskNotifyGive( mqttBuf->taskHandle );
+			//esp_mqtt_client_subscribe(mqtt_client, CONFIG_SUB_TOPIC, 0);
 			break;
 		case MQTT_EVENT_DISCONNECTED:
 			ESP_LOGW(TAG, "MQTT_EVENT_DISCONNECTED");
-			xEventGroupClearBits(xEventGroupHandle, MQTT_CONNECTED_BIT);
+			xTaskNotifyGive( mqttBuf->taskHandle );
 			break;
 		case MQTT_EVENT_SUBSCRIBED:
 			ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
@@ -55,75 +64,79 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
 			break;
 		case MQTT_EVENT_DATA:
 			ESP_LOGI(TAG, "MQTT_EVENT_DATA");
-			MQTT_t mqttBuf;
-			//ESP_LOGI(TAG, "TOPIC=%.*s\r", event->topic_len, event->topic);
-			//ESP_LOGI(TAG, "DATA=%.*s\r", event->data_len, event->data);
-			mqttBuf.topic_type = SUBSCRIBE;
-			mqttBuf.topic_len = event->topic_len;
+			ESP_LOGI(TAG, "TOPIC=[%.*s] DATA=[%.*s]\r", event->topic_len, event->topic, event->data_len, event->data);
+
+			mqttBuf->topic_len = event->topic_len;
 			for(int i=0;i<event->topic_len;i++) {
-				mqttBuf.topic[i] = event->topic[i];
-				mqttBuf.topic[i+1] = 0;
+				mqttBuf->topic[i] = event->topic[i];
+				mqttBuf->topic[i+1] = 0;
 			}
-			mqttBuf.data_len = event->data_len;
+			mqttBuf->data_len = event->data_len;
 			for(int i=0;i<event->data_len;i++) {
-				mqttBuf.data[i] = event->data[i];
-				mqttBuf.data[i+1] = 0;
+				mqttBuf->data[i] = event->data[i];
+				mqttBuf->data[i+1] = 0;
 			}
-			xQueueSend(xQueueSubscribe, &mqttBuf, 0);
+			xTaskNotifyGive( mqttBuf->taskHandle );
 			break;
 		case MQTT_EVENT_ERROR:
 			ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
+			xTaskNotifyGive( mqttBuf->taskHandle );
 			break;
 		default:
 			ESP_LOGI(TAG, "Other event id:%d", event->event_id);
 			break;
 	}
-	return ESP_OK;
 }
 
 void mqtt_sub(void *pvParameters)
 {
-	ESP_LOGI(TAG, "Start Subscribe Broker:%s", CONFIG_BROKER_URL);
+	ESP_LOGI(TAG, "Start");
+	ESP_LOGI(TAG, "CONFIG_BROKER_URL=[%s]", CONFIG_BROKER_URL);
+
+	uint8_t mac[8];
+	ESP_ERROR_CHECK(esp_base_mac_addr_get(mac));
+	for(int i=0;i<8;i++) {
+		ESP_LOGI(TAG, "mac[%d]=%x", i, mac[i]);
+	}
+	char client_id[64];
+	//strcpy(client_id, pcTaskGetName(NULL));
+	sprintf(client_id, "sub-%02x%02x%02x%02x%02x%02x", mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
+	ESP_LOGI(TAG, "client_id=[%s]", client_id);
+
+	MQTT_t mqttBuf;
+	mqttBuf.taskHandle = xTaskGetCurrentTaskHandle();
+	esp_mqtt_client_config_t mqtt_cfg = {
+		.user_context = &mqttBuf,
+		.uri = CONFIG_BROKER_URL,
+		.client_id = client_id
+	};
+
+	esp_mqtt_client_handle_t mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
+	esp_mqtt_client_register_event(mqtt_client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
+	esp_mqtt_client_start(mqtt_client);
+
 	CMD_t cmdBuf;
 	cmdBuf.taskHandle = xTaskGetCurrentTaskHandle();
 	cmdBuf.command = CMD_TAKE;
-
-	esp_mqtt_client_config_t mqtt_cfg = {
-		.uri = CONFIG_BROKER_URL,
-		.event_handle = mqtt_event_handler,
-		.client_id = "subscribe",
-	};
-
-	/* Create Queue */
-	xQueueSubscribe = xQueueCreate( 10, sizeof(MQTT_t) );
-	configASSERT( xQueueSubscribe );
-
-	/* Create Eventgroup */
-	xEventGroupHandle = xEventGroupCreate();
-	configASSERT( xEventGroupHandle );
-
-	esp_mqtt_client_handle_t mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
-	xEventGroupClearBits(xEventGroupHandle, MQTT_CONNECTED_BIT);
-	esp_mqtt_client_start(mqtt_client);
-	xEventGroupWaitBits(xEventGroupHandle, MQTT_CONNECTED_BIT, false, true, portMAX_DELAY);
-	ESP_LOGI(TAG, "Connect to MQTT Server");
-
-	//esp_mqtt_client_subscribe(mqtt_client, CONFIG_SUB_TOPIC, 0);
-	MQTT_t mqttBuf;
 	while (1) {
-		xQueueReceive(xQueueSubscribe, &mqttBuf, portMAX_DELAY);
-		ESP_LOGI(TAG, "type=%d", mqttBuf.topic_type);
+		ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+		ESP_LOGI(TAG, "event_id=%d", mqttBuf.event_id);
 
-		if (mqttBuf.topic_type == SUBSCRIBE) {
+		if (mqttBuf.event_id == MQTT_EVENT_CONNECTED) {
+			esp_mqtt_client_subscribe(mqtt_client, CONFIG_SUB_TOPIC, 0);
+		} else if (mqttBuf.event_id == MQTT_EVENT_DISCONNECTED) {
+			break;
+		} else if (mqttBuf.event_id == MQTT_EVENT_DATA) {
 			ESP_LOGI(TAG, "TOPIC=%.*s\r", mqttBuf.topic_len, mqttBuf.topic);
 			ESP_LOGI(TAG, "DATA=%.*s\r", mqttBuf.data_len, mqttBuf.data);
 			if (xQueueSend(xQueueCmd, &cmdBuf, 10) != pdPASS) {
 				ESP_LOGE(TAG, "xQueueSend fail");
 			}
-		} // end if
+		} else if (mqttBuf.event_id == MQTT_EVENT_ERROR) {
+			break;
+		}
 	} // end while
 
-	// Never reach here
 	ESP_LOGI(TAG, "Task Delete");
 	esp_mqtt_client_stop(mqtt_client);
 	vTaskDelete(NULL);

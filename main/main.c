@@ -18,6 +18,7 @@
 #include "esp_log.h"
 #include "esp_wifi.h"
 #include "esp_event.h"
+#include "esp_mac.h"
 #include "nvs_flash.h"
 #include "esp_spiffs.h" 
 #include "esp_sntp.h"
@@ -417,10 +418,23 @@ void app_main(void)
 	sprintf(cparam0, IPSTR, IP2STR(&ip_info.ip));
 	xTaskCreate(http_task, "HTTP", 1024*6, (void *)cparam0, 2, NULL);
 
+	/* Create EventGroup */
 	s_mqtt_event_group = xEventGroupCreate();
+
+    uint8_t mac[8];
+    ESP_ERROR_CHECK(esp_base_mac_addr_get(mac));
+    for(int i=0;i<8;i++) {
+        ESP_LOGI(TAG, "mac[%d]=%x", i, mac[i]);
+    }
+    char client_id[64];
+    //strcpy(client_id, pcTaskGetName(NULL));
+    sprintf(client_id, "pub-%02x%02x%02x%02x%02x%02x", mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
+    ESP_LOGI(TAG, "client_id=[%s]", client_id);
+
 	esp_mqtt_client_config_t mqtt_cfg = {
 		.uri = CONFIG_BROKER_URL,
 		.event_handle = mqtt_event_handler,
+		.client_id = client_id
 	};
 	esp_mqtt_client_handle_t mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
 	esp_mqtt_client_start(mqtt_client);
