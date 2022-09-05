@@ -179,7 +179,7 @@ $ npm saveFile.js
 Read [this](https://github.com/nopnop2002/esp-idf-mqtt-camera/tree/master/flask).   
 
 
-# Take & view pictures using flask
+# Take & view pictures using android
 Read [this](https://github.com/nopnop2002/esp-idf-mqtt-camera/tree/master/dash).   
 
 # Built-in WEB Server
