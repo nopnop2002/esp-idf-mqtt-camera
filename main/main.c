@@ -288,15 +288,15 @@ void wifi_init_sta()
 
 void initialise_mdns(void)
 {
-    //initialize mDNS
-    ESP_ERROR_CHECK( mdns_init() );
-    //set mDNS hostname (required if you want to advertise services)
-    ESP_ERROR_CHECK( mdns_hostname_set(CONFIG_MDNS_HOSTNAME) );
-    ESP_LOGI(TAG, "mdns hostname set to: [%s]", CONFIG_MDNS_HOSTNAME);
+	//initialize mDNS
+	ESP_ERROR_CHECK( mdns_init() );
+	//set mDNS hostname (required if you want to advertise services)
+	ESP_ERROR_CHECK( mdns_hostname_set(CONFIG_MDNS_HOSTNAME) );
+	ESP_LOGI(TAG, "mdns hostname set to: [%s]", CONFIG_MDNS_HOSTNAME);
 
 #if 0
-    //set default mDNS instance name
-    ESP_ERROR_CHECK( mdns_instance_name_set("ESP32 with mDNS") );
+	//set default mDNS instance name
+	ESP_ERROR_CHECK( mdns_instance_name_set("ESP32 with mDNS") );
 #endif
 }
 
@@ -421,15 +421,15 @@ void app_main(void)
 	/* Create EventGroup */
 	s_mqtt_event_group = xEventGroupCreate();
 
-    uint8_t mac[8];
-    ESP_ERROR_CHECK(esp_base_mac_addr_get(mac));
-    for(int i=0;i<8;i++) {
-        ESP_LOGI(TAG, "mac[%d]=%x", i, mac[i]);
-    }
-    char client_id[64];
-    //strcpy(client_id, pcTaskGetName(NULL));
-    sprintf(client_id, "pub-%02x%02x%02x%02x%02x%02x", mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
-    ESP_LOGI(TAG, "client_id=[%s]", client_id);
+	uint8_t mac[8];
+	ESP_ERROR_CHECK(esp_base_mac_addr_get(mac));
+	for(int i=0;i<8;i++) {
+		ESP_LOGI(TAG, "mac[%d]=%x", i, mac[i]);
+	}
+	char client_id[64];
+	//strcpy(client_id, pcTaskGetName(NULL));
+	sprintf(client_id, "pub-%02x%02x%02x%02x%02x%02x", mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
+	ESP_LOGI(TAG, "client_id=[%s]", client_id);
 
 	esp_mqtt_client_config_t mqtt_cfg = {
 		.uri = CONFIG_BROKER_URL,
