@@ -178,6 +178,10 @@ $ npm saveFile.js
 # Take & view pictures using flask
 Read [this](https://github.com/nopnop2002/esp-idf-mqtt-camera/tree/master/flask).   
 
+
+# Take & view pictures using flask
+Read [this](https://github.com/nopnop2002/esp-idf-mqtt-camera/tree/master/dash).   
+
 # Built-in WEB Server
 You can check the photos taken using the built-in WEB server.   
 Enter the ESP32's IP address and port number in the address bar of your browser.   
