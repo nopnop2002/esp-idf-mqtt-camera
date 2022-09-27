@@ -20,9 +20,6 @@
 
 static const char *TAG = "SUB";
 
-extern int WIFI_CONNECTED_BIT;
-extern int MQTT_CONNECTED_BIT;
-
 extern QueueHandle_t xQueueCmd;
 
 /*
