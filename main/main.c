@@ -37,11 +37,11 @@ static EventGroupHandle_t s_mqtt_event_group;
 
 /* The event group allows multiple bits for each event, but we only care about one event */
 /* - are we connected to the AP with an IP? */
-const int WIFI_CONNECTED_BIT = BIT0;
-const int WIFI_FAIL_BIT = BIT1;
+#define WIFI_CONNECTED_BIT BIT0
+#define WIFI_FAIL_BIT BIT1
 
 /* - are we connected to the MQTT Server? */
-const int MQTT_CONNECTED_BIT = BIT2;
+#define MQTT_CONNECTED_BIT BIT2
 
 static const char *TAG = "MAIN";
 
@@ -430,6 +430,7 @@ void app_main(void)
 	//strcpy(client_id, pcTaskGetName(NULL));
 	sprintf(client_id, "pub-%02x%02x%02x%02x%02x%02x", mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
 	ESP_LOGI(TAG, "client_id=[%s]", client_id);
+	ESP_LOGI(TAG, "CONFIG_BROKER_URL=[%s]", CONFIG_BROKER_URL);
 
 	esp_mqtt_client_config_t mqtt_cfg = {
 		.uri = CONFIG_BROKER_URL,
@@ -518,7 +519,8 @@ void app_main(void)
 
 				ESP_LOGI(TAG, "Captured with %s. fb->len=%d", FRAMESIZE_STRING, fb->len);
 				//int msg_id = esp_mqtt_client_publish(mqtt_client, CONFIG_PUB_TOPIC, "test", 0, 1, 0);
-				int msg_id = esp_mqtt_client_publish(mqtt_client, CONFIG_PUB_TOPIC, (char *)fb->buf, fb->len, 1, 0);
+				//int msg_id = esp_mqtt_client_publish(mqtt_client, CONFIG_PUB_TOPIC, (char *)fb->buf, fb->len, 1, 0);
+				int msg_id = esp_mqtt_client_publish(mqtt_client, CONFIG_PUB_TOPIC, (char *)fb->buf, fb->len, 0, 0);
 				if (msg_id < 0) {
 					ESP_LOGE(TAG, "esp_mqtt_client_publish fail. msg_id=%d", msg_id);
 				} else {
