@@ -64,6 +64,8 @@ You can use static IP.
 
 ![config-mqtt](https://user-images.githubusercontent.com/6020549/182986503-3bd24cf6-574e-488b-bd8b-07ae1ba0a522.jpg)
 
+You can use [this](https://github.com/nopnop2002/esp-idf-mqtt-broker) as MQTT Server.   
+
 ## Select Frame Size
 Large frame sizes take longer to take a picture.   
 
