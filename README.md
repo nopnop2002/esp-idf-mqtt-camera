@@ -135,6 +135,7 @@ ESP32-CAM by AI-Thinker have flash light on GPIO4.
 
 ![config-flash](https://user-images.githubusercontent.com/6020549/122479023-6b630f00-d005-11eb-98cc-b5fdbf2987c7.jpg)
 
+
 # Save pictures using python   
 You can use saveFile.py to save pictures.   
 Change the following according to your environment.   
@@ -148,11 +149,34 @@ topic = '/image/#'
 saveFile = './output.jpg'
 ```
 
-Requires mqtt library.   
+Requires library.   
 ```
 $ python3 -m pip install -U wheel
 $ python3 -m pip install paho-mqtt
 $ python3 saveFile.py
+```
+
+# View pictures using python   
+You can use viewFile.py to view pictures.   
+Change the following according to your environment.   
+Requires X-Window environment.   
+
+```
+# MQTT Broker
+host = 'your_broker'
+# MQTT Subscribe Topic
+topic = '/image/#'
+# Save File
+saveFile = './output.jpg'
+```
+
+Requires library.   
+```
+$ python3 -m pip install -U wheel
+$ python3 -m pip install paho-mqtt
+$ python3 -m pip install opencv-python
+$ python3 -m pip install numpy
+$ python3 viewFile.py
 ```
 
 
@@ -181,6 +205,7 @@ Read [this](https://github.com/nopnop2002/esp-idf-mqtt-camera/tree/master/flask)
 
 # Take & view pictures using android
 Read [this](https://github.com/nopnop2002/esp-idf-mqtt-camera/tree/master/dash).   
+
 
 # Built-in WEB Server
 You can check the photos taken using the built-in WEB server.   
