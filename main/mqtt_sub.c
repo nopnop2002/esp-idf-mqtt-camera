@@ -14,7 +14,6 @@
 #include "mqtt_client.h"
 
 #include "cmd.h"
-#include "mqtt.h"
 
 #if CONFIG_SHUTTER_MQTT
 
