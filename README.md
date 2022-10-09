@@ -105,7 +105,7 @@ I confirmed that the following GPIO can be used.
 
 ![config-shutter-3](https://user-images.githubusercontent.com/6020549/99891865-d340b980-2cb1-11eb-9da5-944bd6a07c17.jpg)
 
-You can use pub.py as shutter.   
+You can use publish.py as shutter.   
 Change the following according to your environment.   
 
 ```

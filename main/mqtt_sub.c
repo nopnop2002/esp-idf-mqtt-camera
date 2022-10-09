@@ -11,9 +11,12 @@
 #include "esp_log.h"
 #include "esp_event.h"
 #include "esp_mac.h"
+#include "mdns.h"
+#include "netdb.h" // gethostbyname
 #include "mqtt_client.h"
 
 #include "cmd.h"
+#include "mqtt.h"
 
 #if CONFIG_SHUTTER_MQTT
 
@@ -84,11 +87,14 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 	}
 }
 
+esp_err_t query_mdns_host(const char * host_name, char *ip);
+void convert_mdns_host(char * from, char * to);
+
 void mqtt_sub(void *pvParameters)
 {
 	ESP_LOGI(TAG, "Start");
-	ESP_LOGI(TAG, "CONFIG_BROKER_URL=[%s]", CONFIG_BROKER_URL);
 
+	// Set client id from mac
 	uint8_t mac[8];
 	ESP_ERROR_CHECK(esp_base_mac_addr_get(mac));
 	for(int i=0;i<8;i++) {
@@ -99,11 +105,21 @@ void mqtt_sub(void *pvParameters)
 	sprintf(client_id, "sub-%02x%02x%02x%02x%02x%02x", mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
 	ESP_LOGI(TAG, "client_id=[%s]", client_id);
 
+	// Resolve mDNS host name
+    char ip[128];
+    ESP_LOGI(TAG, "CONFIG_MQTT_BROKER=[%s]", CONFIG_MQTT_BROKER);
+    convert_mdns_host(CONFIG_MQTT_BROKER, ip);
+    ESP_LOGI(TAG, "ip=[%s]", ip);
+    char uri[128];
+    sprintf(uri, "mqtt://%s", ip);
+    ESP_LOGI(TAG, "uri=[%s]", uri);
+
 	MQTT_t mqttBuf;
 	mqttBuf.taskHandle = xTaskGetCurrentTaskHandle();
 	esp_mqtt_client_config_t mqtt_cfg = {
 		.user_context = &mqttBuf,
-		.uri = CONFIG_BROKER_URL,
+		//.uri = CONFIG_BROKER_URL,
+		.uri = uri,
 		.client_id = client_id
 	};
 

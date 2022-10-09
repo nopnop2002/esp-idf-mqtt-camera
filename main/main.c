@@ -336,7 +336,6 @@ esp_err_t mountSPIFFS(char * partition_label, char * base_path) {
 	return ret;
 }
 
-
 esp_err_t query_mdns_host(const char * host_name, char *ip)
 {
 	ESP_LOGD(__FUNCTION__, "Query A: %s", host_name);
@@ -359,7 +358,8 @@ esp_err_t query_mdns_host(const char * host_name, char *ip)
 	return ESP_OK;
 }
 
-void convert_mdns_host(char * from, char * to) {
+void convert_mdns_host(char * from, char * to)
+{
     ESP_LOGI(__FUNCTION__, "from=[%s]",from);
     strcpy(to, from);
     char *sp;
@@ -467,6 +467,7 @@ void app_main(void)
 	/* Create EventGroup */
 	s_mqtt_event_group = xEventGroupCreate();
 
+	// Set client id from mac
 	uint8_t mac[8];
 	ESP_ERROR_CHECK(esp_base_mac_addr_get(mac));
 	for(int i=0;i<8;i++) {
@@ -477,6 +478,7 @@ void app_main(void)
 	sprintf(client_id, "pub-%02x%02x%02x%02x%02x%02x", mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
 	ESP_LOGI(TAG, "client_id=[%s]", client_id);
 
+	// Resolve mDNS host name
 	char ip[128];
 	ESP_LOGI(TAG, "CONFIG_MQTT_BROKER=[%s]", CONFIG_MQTT_BROKER);
 	convert_mdns_host(CONFIG_MQTT_BROKER, ip);
