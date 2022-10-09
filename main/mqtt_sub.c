@@ -106,13 +106,13 @@ void mqtt_sub(void *pvParameters)
 	ESP_LOGI(TAG, "client_id=[%s]", client_id);
 
 	// Resolve mDNS host name
-    char ip[128];
-    ESP_LOGI(TAG, "CONFIG_MQTT_BROKER=[%s]", CONFIG_MQTT_BROKER);
-    convert_mdns_host(CONFIG_MQTT_BROKER, ip);
-    ESP_LOGI(TAG, "ip=[%s]", ip);
-    char uri[128];
-    sprintf(uri, "mqtt://%s", ip);
-    ESP_LOGI(TAG, "uri=[%s]", uri);
+	char ip[128];
+	ESP_LOGI(TAG, "CONFIG_MQTT_BROKER=[%s]", CONFIG_MQTT_BROKER);
+	convert_mdns_host(CONFIG_MQTT_BROKER, ip);
+	ESP_LOGI(TAG, "ip=[%s]", ip);
+	char uri[128];
+	sprintf(uri, "mqtt://%s", ip);
+	ESP_LOGI(TAG, "uri=[%s]", uri);
 
 	MQTT_t mqttBuf;
 	mqttBuf.taskHandle = xTaskGetCurrentTaskHandle();
