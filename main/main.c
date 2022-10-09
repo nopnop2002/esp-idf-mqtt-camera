@@ -23,6 +23,7 @@
 #include "esp_spiffs.h" 
 #include "esp_sntp.h"
 #include "mdns.h"
+#include "netdb.h" // gethostbyname
 #include "lwip/dns.h"
 #include "mqtt_client.h"
 
@@ -337,6 +338,52 @@ esp_err_t mountSPIFFS(char * partition_label, char * base_path) {
 }
 
 
+esp_err_t query_mdns_host(const char * host_name, char *ip)
+{
+	ESP_LOGD(__FUNCTION__, "Query A: %s", host_name);
+
+	struct esp_ip4_addr addr;
+	addr.addr = 0;
+
+	esp_err_t err = mdns_query_a(host_name, 10000,	&addr);
+	if(err){
+		if(err == ESP_ERR_NOT_FOUND){
+			ESP_LOGW(__FUNCTION__, "%s: Host was not found!", esp_err_to_name(err));
+			return ESP_FAIL;
+		}
+		ESP_LOGE(__FUNCTION__, "Query Failed: %s", esp_err_to_name(err));
+		return ESP_FAIL;
+	}
+
+	ESP_LOGD(__FUNCTION__, "Query A: %s.local resolved to: " IPSTR, host_name, IP2STR(&addr));
+	sprintf(ip, IPSTR, IP2STR(&addr));
+	return ESP_OK;
+}
+
+void convert_mdns_host(char * from, char * to) {
+    ESP_LOGI(__FUNCTION__, "from=[%s]",from);
+    strcpy(to, from);
+    char *sp;
+    sp = strstr(from, ".local");
+    if (sp == NULL) return;
+
+    int _len = sp - from;
+    ESP_LOGD(__FUNCTION__, "_len=%d", _len);
+    char _from[128];
+    strcpy(_from, from);
+    _from[_len] = 0;
+    ESP_LOGI(__FUNCTION__, "_from=[%s]", _from);
+
+    char _ip[128];
+    esp_err_t ret = query_mdns_host(_from, _ip);
+    ESP_LOGI(__FUNCTION__, "query_mdns_host=%d _ip=[%s]", ret, _ip);
+    if (ret != ESP_OK) return;
+
+    strcpy(to, _ip);
+    ESP_LOGI(__FUNCTION__, "to=[%s]", to);
+}
+
+
 //void mqtt_pub(void *pvParameters);
 
 #if CONFIG_SHUTTER_ENTER
@@ -430,10 +477,18 @@ void app_main(void)
 	//strcpy(client_id, pcTaskGetName(NULL));
 	sprintf(client_id, "pub-%02x%02x%02x%02x%02x%02x", mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
 	ESP_LOGI(TAG, "client_id=[%s]", client_id);
-	ESP_LOGI(TAG, "CONFIG_BROKER_URL=[%s]", CONFIG_BROKER_URL);
+
+	char ip[128];
+	ESP_LOGI(TAG, "CONFIG_MQTT_BROKER=[%s]", CONFIG_MQTT_BROKER);
+	convert_mdns_host(CONFIG_MQTT_BROKER, ip);
+	ESP_LOGI(TAG, "ip=[%s]", ip);
+	char uri[128];
+	sprintf(uri, "mqtt://%s", ip);
+	ESP_LOGI(TAG, "uri=[%s]", uri);
 
 	esp_mqtt_client_config_t mqtt_cfg = {
-		.uri = CONFIG_BROKER_URL,
+		//.uri = CONFIG_BROKER_URL,
+		.uri = uri,
 		.event_handle = mqtt_event_handler,
 		.client_id = client_id
 	};

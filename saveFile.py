@@ -7,11 +7,11 @@ import paho.mqtt.client as mqtt
 
 # MQTT Broker
 host = 'your_broker'
-#host = '192.168.10.40'
+#host = 'esp32-broker.local'
 # MQTT Port
 port = 1883
 # MQTT Subscribe Topic
-topic = '/image/#'
+topic = '/image/esp32cam'
 # Save File
 saveFile = './output.jpg'
 

@@ -56,11 +56,11 @@ menu "Application Configuration"
 
 	menu "MQTT Server Setting"
 
-		config BROKER_URL
-			string "Broker URL"
-			default "mqtt://your_broker"
+		config MQTT_BROKER
+			string "MQTT Broker"
+			default "esp32-broker.local"
 			help
-				URL or IP address of the broker to connect to
+				Host name or IP address of the broker to connect to
 
 		config PUB_TOPIC
 			string "Publish Topic"

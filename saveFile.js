@@ -3,9 +3,9 @@
 
 // MQTT Broker
 host = 'mqtt://your_broker'
-//host = 'mqtt://192.168.10.40'
+//host = 'mqtt://esp32-broker.local'
 // MQTT Subscribe Topic
-topic = '/image/#';
+topic = '/image/esp32cam';
 // Save File
 saveFile = './output.jpg'
 

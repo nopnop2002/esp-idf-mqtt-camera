@@ -62,7 +62,7 @@ You can use static IP.
 
 ## MQTT Server Setting
 
-![config-mqtt](https://user-images.githubusercontent.com/6020549/182986503-3bd24cf6-574e-488b-bd8b-07ae1ba0a522.jpg)
+![config-mqtt](https://user-images.githubusercontent.com/6020549/194732213-8f7291e7-75b5-46c0-918d-c8002d19e1ff.jpg)
 
 You can use [this](https://github.com/nopnop2002/esp-idf-mqtt-broker) as MQTT Server.   
 
@@ -146,7 +146,7 @@ Change the following according to your environment.
 # MQTT Broker
 host = 'your_broker'
 # MQTT Subscribe Topic
-topic = '/image/#'
+topic = '/image/esp32cam'
 # Save File
 saveFile = './output.jpg'
 ```
@@ -167,7 +167,7 @@ Requires X-Window environment.
 # MQTT Broker
 host = 'your_broker'
 # MQTT Subscribe Topic
-topic = '/image/#'
+topic = '/image/esp32cam'
 # Save File
 saveFile = './output.jpg'
 ```
@@ -190,7 +190,7 @@ Change the following according to your environment.
 // MQTT Broker
 host = 'mqtt://your_broker'
 // MQTT Subscribe Topic
-topic = '/image/#';
+topic = '/image/esp32cam';
 // Save File
 saveFile = './output.jpg'
 ```
