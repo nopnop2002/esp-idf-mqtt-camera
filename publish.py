@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import random
 import paho.mqtt.client as mqtt
 
 # MQTT Broker
-#host = 'your_broker'
 host = 'esp32-broker.local'
 # MQTT Port
 port = 1883
@@ -11,7 +11,8 @@ port = 1883
 topic = '/topic/picture/sub'
 
 if __name__=='__main__':
-	client = mqtt.Client(protocol=mqtt.MQTTv311)
+	client_id = f'python-mqtt-{random.randint(0, 1000)}'
+	client = mqtt.Client(client_id=client_id, protocol=mqtt.MQTTv311)
 	client.connect(host, port=port, keepalive=60)
 	client.publish(topic, b'take picture')
 	client.disconnect()

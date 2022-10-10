@@ -72,12 +72,11 @@ esp_err_t Image2Base64(char * filename, size_t fsize, unsigned char * base64_buf
 	if((fp=fopen(filename,"rb"))==NULL){
 		ESP_LOGE(TAG, "fopen fail. [%s]", filename);
 		return ESP_FAIL;
-	}else{
-		for (int i=0;i<fsize;i++) {
-			fread(&image_buffer[i],sizeof(char),1,fp);
-		}
-		fclose(fp);
 	}
+	for (int i=0;i<fsize;i++) {
+		fread(&image_buffer[i],sizeof(char),1,fp);
+	}
+	fclose(fp);
 
 	size_t encord_len;
 	esp_err_t ret = mbedtls_base64_encode(base64_buffer, base64_buffer_len, &encord_len, image_buffer, fsize);

@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 #python3 -m pip install -U wheel
 #python3 -m pip install paho-mqtt
+import random
 import paho.mqtt.client as mqtt
 
 
 # MQTT Broker
-host = 'your_broker'
-#host = 'esp32-broker.local'
+host = 'esp32-broker.local'
 # MQTT Port
 port = 1883
 # MQTT Subscribe Topic
@@ -28,7 +28,8 @@ def on_message(client, userdata, msg):
 	print('file {} ({} bytes) write successfully'.format(saveFile, len(msg.payload)))
 
 if __name__=='__main__':
-	client = mqtt.Client(protocol=mqtt.MQTTv311)
+	client_id = f'python-mqtt-{random.randint(0, 1000)}'
+	client = mqtt.Client(client_id=client_id, protocol=mqtt.MQTTv311)
 	client.on_connect = on_connect
 	client.on_message = on_message
 	client.connect(host, port=port, keepalive=60)

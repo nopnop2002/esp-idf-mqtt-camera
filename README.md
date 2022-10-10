@@ -122,7 +122,7 @@ Change the following according to your environment.
 
 ```
 # MQTT Broker
-host = 'your_broker'
+host = 'esp32-broker.local'
 # MQTT Port
 port = 1883
 # MQTT Publish Topic
@@ -156,7 +156,7 @@ Change the following according to your environment.
 
 ```
 # MQTT Broker
-host = 'your_broker'
+host = 'esp32-broker.local'
 # MQTT Subscribe Topic
 topic = '/image/esp32cam'
 # Save File
@@ -177,7 +177,7 @@ Requires X-Window environment.
 
 ```
 # MQTT Broker
-host = 'your_broker'
+host = 'esp32-broker.local'
 # MQTT Subscribe Topic
 topic = '/image/esp32cam'
 # Save File
