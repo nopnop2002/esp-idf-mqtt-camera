@@ -3,6 +3,7 @@
 #python3 -m pip install -U wheel
 #python3 -m pip install paho-mqtt
 import random
+import socket
 import paho.mqtt.client as mqtt
 
 
@@ -28,10 +29,12 @@ def on_message(client, userdata, msg):
 	print('file {} ({} bytes) write successfully'.format(saveFile, len(msg.payload)))
 
 if __name__=='__main__':
+	_host = socket.gethostbyname(host)
+	print("_host={}".format(_host))
 	client_id = f'python-mqtt-{random.randint(0, 1000)}'
 	client = mqtt.Client(client_id=client_id, protocol=mqtt.MQTTv311)
 	client.on_connect = on_connect
 	client.on_message = on_message
-	client.connect(host, port=port, keepalive=60)
+	client.connect(_host, port=port, keepalive=60)
 	client.loop_forever()
 
