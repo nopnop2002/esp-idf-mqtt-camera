@@ -73,10 +73,10 @@ You can connect using the mDNS hostname instead of the IP address.
  ```CONFIG_MDNS_STRICT_MODE=y```
 
 ## MQTT Server Setting
+You can download the MQTT broker from [here](https://github.com/nopnop2002/esp-idf-mqtt-broker).   
 
 ![config-mqtt](https://user-images.githubusercontent.com/6020549/194732213-8f7291e7-75b5-46c0-918d-c8002d19e1ff.jpg)
 
-You can use [this](https://github.com/nopnop2002/esp-idf-mqtt-broker) as MQTT Server.   
 
 ## Select Frame Size
 Large frame sizes take longer to take a picture.   
