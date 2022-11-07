@@ -14,7 +14,7 @@ If you use other camera, edit sdkconfig.default.
 esp-idf v4.4 or later.   
 
 # Installation
-Use a USB-TTL converter.   
+For AiThinker ESP32-CAM, You have to use a USB-TTL converter.   
 
 |ESP-32|USB-TTL|
 |:-:|:-:|
@@ -35,7 +35,7 @@ idf.py flash monitor
 ```
 
 # Start firmware
-Change GPIO0 to open and press the RESET button.
+For AiThinker ESP32-CAM, Change GPIO0 to open and press the RESET button.
 
 # Configuration
 Set the following items using menuconfig.
@@ -76,7 +76,7 @@ You can download the MQTT broker from [here](https://github.com/nopnop2002/esp-i
 ![config-mqtt](https://user-images.githubusercontent.com/6020549/194732213-8f7291e7-75b5-46c0-918d-c8002d19e1ff.jpg)
 
 
-### Select Board
+## Select Board
 ![config-board](https://user-images.githubusercontent.com/6020549/200430994-9176ffbe-d71d-4601-a2cc-69de0cf833af.jpg)
 
 
@@ -117,7 +117,7 @@ I confirmed that the following GPIO can be used.
 
 - Shutter is MQTT Publish   
 
-![config-shutter-3](https://user-images.githubusercontent.com/6020549/99891865-d340b980-2cb1-11eb-9da5-944bd6a07c17.jpg)
+![config-shutter-3](https://user-images.githubusercontent.com/6020549/200434412-adecbc77-7ba6-4520-9731-cc3eec301b84.jpg)
 
 You can use mosquitto_pub as shutter.   
 
