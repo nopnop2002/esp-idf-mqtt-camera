@@ -20,13 +20,13 @@ I use local server as broker.
 ## Add Shutter button   
 - Name:shutter
 - Topic(sub):(empty)
-- Topic(pub):/topic/picture/sub
+- Topic(pub):/take/picture
 - Payload(on):1
 - Payload(off):0
 - Icon Image:Choose your favorite one
 - Icon Color:Choose your favorite one
 
-![shutter](https://user-images.githubusercontent.com/6020549/188520937-75d5c258-2f81-4500-b282-22994ac39297.jpg)
+![shutter](https://user-images.githubusercontent.com/6020549/200437683-6933cbc9-745c-41cb-ad37-84b76c06cfe5.jpg)
 
 ## Add Image object
 - Image file data receive as binary payload contents
