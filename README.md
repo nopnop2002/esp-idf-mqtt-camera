@@ -6,11 +6,9 @@ This project use [ESP32 Camera Driver](https://github.com/espressif/esp32-camera
 ![slide0002](https://user-images.githubusercontent.com/6020549/123804188-f8706700-d927-11eb-83ed-65d3aaf2a335.jpg)
 
 # Hardware requirements
-ESP32-CAM Development board.   
-Support for OV2640 camera.   
+ESP32 development board with OV2640 camera.   
 If you use other camera, edit sdkconfig.default.   
-![ESP32-CAM-1](https://user-images.githubusercontent.com/6020549/118466947-4fd2c300-b73e-11eb-8e64-23260e73e693.JPG)
-![ESP32-CAM-2](https://user-images.githubusercontent.com/6020549/118466960-53664a00-b73e-11eb-8950-a5058516e1a3.JPG)
+![ESP32-Camera-board](https://user-images.githubusercontent.com/6020549/198520670-27ea9bd1-71d8-438f-be58-8516154be4af.JPG)
 
 # Software requirements
 esp-idf v4.4 or later.   
@@ -43,7 +41,7 @@ Change GPIO0 to open and press the RESET button.
 Set the following items using menuconfig.
 
 ![config-main](https://user-images.githubusercontent.com/6020549/99891822-7f35d500-2cb1-11eb-928c-be9a8191dec9.jpg)
-![config-app](https://user-images.githubusercontent.com/6020549/119053256-ca326a00-ba00-11eb-9fcc-c520957c6592.jpg)
+![config-app](https://user-images.githubusercontent.com/6020549/200430857-7ae56376-038e-40ea-a694-15f49948e27b.jpg)
 
 ## Wifi Setting
 
@@ -76,6 +74,10 @@ You can connect using the mDNS hostname instead of the IP address.
 You can download the MQTT broker from [here](https://github.com/nopnop2002/esp-idf-mqtt-broker).   
 
 ![config-mqtt](https://user-images.githubusercontent.com/6020549/194732213-8f7291e7-75b5-46c0-918d-c8002d19e1ff.jpg)
+
+
+### Select Board
+![config-board](https://user-images.githubusercontent.com/6020549/200430994-9176ffbe-d71d-4601-a2cc-69de0cf833af.jpg)
 
 
 ## Select Frame Size
@@ -117,29 +119,10 @@ I confirmed that the following GPIO can be used.
 
 ![config-shutter-3](https://user-images.githubusercontent.com/6020549/99891865-d340b980-2cb1-11eb-9da5-944bd6a07c17.jpg)
 
-You can use publish.py as shutter.   
-Change the following according to your environment.   
-
-```
-# MQTT Broker
-host = 'esp32-broker.local'
-# MQTT Port
-port = 1883
-# MQTT Publish Topic
-topic = '/topic/picture/sub'
-```
-
-Requires mqtt library.   
-```
-$ python3 -m pip install -U wheel
-$ python3 -m pip install paho-mqtt
-$ python3 pub.py
-```
-
 You can use mosquitto_pub as shutter.   
 
 ```
-$ mosquitto_pub -h your_broker -p 1883 -t "/topic/picture/sub" -m ""
+mosquitto_pub -h your_broker -p 1883 -t "/take/picture" -m ""
 ```
 
 
@@ -150,67 +133,22 @@ ESP32-CAM by AI-Thinker have flash light on GPIO4.
 ![config-flash](https://user-images.githubusercontent.com/6020549/122479023-6b630f00-d005-11eb-98cc-b5fdbf2987c7.jpg)
 
 
-# Save pictures using python   
-You can use saveFile.py to save pictures.   
-Change the following according to your environment.   
-
-```
-# MQTT Broker
-host = 'esp32-broker.local'
-# MQTT Subscribe Topic
-topic = '/image/esp32cam'
-# Save File
-saveFile = './output.jpg'
-```
-
-Requires library.   
-```
-$ python3 -m pip install -U wheel
-$ python3 -m pip install paho-mqtt
-$ python3 saveFile.py
-```
-
 # View pictures using python   
-You can use viewFile.py to view pictures.   
-Change the following according to your environment.   
-Requires X-Window environment.   
-
+You can use subscribe.py as viewer.   
 ```
-# MQTT Broker
-host = 'esp32-broker.local'
-# MQTT Subscribe Topic
-topic = '/image/esp32cam'
-# Save File
-saveFile = './output.jpg'
-```
-
-Requires library.   
-```
-$ python3 -m pip install -U wheel
-$ python3 -m pip install paho-mqtt
-$ python3 -m pip install opencv-python
-$ python3 -m pip install numpy
-$ python3 viewFile.py
+python3 -m pip install -U wheel
+python3 -m pip install paho-mqtt
+python3 -m pip install opencv-python
+python3 -m pip install numpy
+python3 ./subscribe.py
 ```
 
 
 # Save pictures using node.js   
 You can use saveFile.js to save pictures.   
-Change the following according to your environment.   
-
 ```
-// MQTT Broker
-host = 'mqtt://your_broker'
-// MQTT Subscribe Topic
-topic = '/image/esp32cam';
-// Save File
-saveFile = './output.jpg'
-```
-
-Requires mqtt library.   
-```
-$ npm install mqtt
-$ npm saveFile.js
+npm install mqtt
+npm saveFile.js
 ```
 
 # Take & view pictures using flask
@@ -226,6 +164,7 @@ You can check the photos taken using the built-in WEB server.
 Enter the ESP32's IP address and port number in the address bar of your browser.   
 
 ![browser](https://user-images.githubusercontent.com/6020549/124227364-837a7880-db45-11eb-9d8b-fa15c676adac.jpg)
+
 
 # MQTT client Example
 Example code in various languages.   

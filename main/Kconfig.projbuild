@@ -70,6 +70,22 @@ menu "Application Configuration"
 
 	endmenu
 
+	choice BOARD
+		bool "Select Board"
+		default BOARD_ESP32CAM_AITHINKER
+		help
+			Select Board Type.
+
+		config BOARD_WROVER_KIT
+			bool "Freenove ESP32-WROVER CAM Board"
+		config BOARD_CAMERA_MODEL_ESP_EYE
+			bool "Espressif ESP-EYE"
+		config BOARD_ESP32CAM_AITHINKER
+			bool "AiThinker ESP32-CAM"
+		config BOARD_CAMERA_MODEL_TTGO_T_JOURNAL
+			bool "TTGO T-Journal ESP32 Camera"
+	endchoice
+
 	choice FRAMESIZE
 		bool "Select Frame Size"
 		default FRAMESIZE_VGA
@@ -142,7 +158,7 @@ menu "Application Configuration"
 		config SUB_TOPIC
 			string "Subscribe Topic"
 			depends on SHUTTER_MQTT
-			default "/topic/picture/sub"
+			default "/take/picture"
 			help
 				Topic of subscribe
 

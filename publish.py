@@ -9,7 +9,7 @@ host = 'esp32-broker.local'
 # MQTT Port
 port = 1883
 # MQTT Publish Topic
-topic = '/topic/picture/sub'
+topic = '/take/picture'
 
 if __name__=='__main__':
 	_host = socket.gethostbyname(host)

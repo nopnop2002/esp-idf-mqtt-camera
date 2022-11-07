@@ -7,6 +7,7 @@
 */
 
 #include <stdio.h>
+#include <inttypes.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
@@ -18,7 +19,7 @@
 #include "esp_log.h"
 #include "esp_wifi.h"
 #include "esp_event.h"
-#include "esp_mac.h"
+#include "esp_mac.h" // esp_base_mac_addr_get
 #include "nvs_flash.h"
 #include "esp_spiffs.h" 
 #include "esp_sntp.h"
@@ -28,6 +29,7 @@
 #include "mqtt_client.h"
 
 #include "esp_camera.h"
+#include "camera_pin.h"
 
 #include "cmd.h"
 
@@ -49,54 +51,6 @@ static int s_retry_num = 0;
 
 QueueHandle_t xQueueCmd;
 QueueHandle_t xQueueHttp;
-
-#define BOARD_ESP32CAM_AITHINKER
-
-// WROVER-KIT PIN Map
-#ifdef BOARD_WROVER_KIT
-
-#define CAM_PIN_PWDN -1  //power down is not used
-#define CAM_PIN_RESET -1 //software reset will be performed
-#define CAM_PIN_XCLK 21
-#define CAM_PIN_SIOD 26
-#define CAM_PIN_SIOC 27
-
-#define CAM_PIN_D7 35
-#define CAM_PIN_D6 34
-#define CAM_PIN_D5 39
-#define CAM_PIN_D4 36
-#define CAM_PIN_D3 19
-#define CAM_PIN_D2 18
-#define CAM_PIN_D1 5
-#define CAM_PIN_D0 4
-#define CAM_PIN_VSYNC 25
-#define CAM_PIN_HREF 23
-#define CAM_PIN_PCLK 22
-
-#endif
-
-// ESP32Cam (AiThinker) PIN Map
-#ifdef BOARD_ESP32CAM_AITHINKER
-
-#define CAM_PIN_PWDN 32
-#define CAM_PIN_RESET -1 //software reset will be performed
-#define CAM_PIN_XCLK 0
-#define CAM_PIN_SIOD 26
-#define CAM_PIN_SIOC 27
-
-#define CAM_PIN_D7 35
-#define CAM_PIN_D6 34
-#define CAM_PIN_D5 39
-#define CAM_PIN_D4 36
-#define CAM_PIN_D3 21
-#define CAM_PIN_D2 19
-#define CAM_PIN_D1 18
-#define CAM_PIN_D0 5
-#define CAM_PIN_VSYNC 25
-#define CAM_PIN_HREF 23
-#define CAM_PIN_PCLK 22
-
-#endif
 
 //static camera_config_t camera_config = {
 camera_config_t camera_config = {
@@ -166,9 +120,15 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 	}
 }
 
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
+#else
 static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
+#endif
 {
-	// your_context_t *context = event->context;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+	esp_mqtt_event_handle_t event = event_data;
+#endif
 	switch (event->event_id) {
 		case MQTT_EVENT_CONNECTED:
 			ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
@@ -197,7 +157,9 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
 			ESP_LOGI(TAG, "Other event id:%d", event->event_id);
 			break;
 	}
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
 	return ESP_OK;
+#endif
 }
 
 void wifi_init_sta()
@@ -483,17 +445,29 @@ void app_main(void)
 	ESP_LOGI(TAG, "CONFIG_MQTT_BROKER=[%s]", CONFIG_MQTT_BROKER);
 	convert_mdns_host(CONFIG_MQTT_BROKER, ip);
 	ESP_LOGI(TAG, "ip=[%s]", ip);
-	char uri[128];
+	char uri[138];
 	sprintf(uri, "mqtt://%s", ip);
 	ESP_LOGI(TAG, "uri=[%s]", uri);
 
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 	esp_mqtt_client_config_t mqtt_cfg = {
-		//.uri = CONFIG_BROKER_URL,
+		.broker.address.uri = uri,
+		.credentials.client_id = client_id
+	};
+#else
+	esp_mqtt_client_config_t mqtt_cfg = {
 		.uri = uri,
 		.event_handle = mqtt_event_handler,
 		.client_id = client_id
 	};
+#endif
+
 	esp_mqtt_client_handle_t mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
+
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+	esp_mqtt_client_register_event(mqtt_client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
+#endif
+
 	esp_mqtt_client_start(mqtt_client);
 
 #if CONFIG_FRAMESIZE_240X240
@@ -543,7 +517,7 @@ void app_main(void)
 		if (cmdBuf.command == CMD_HALT) break;
 
 		EventBits_t mqttConnectBits = xEventGroupGetBits(s_mqtt_event_group);
-		ESP_LOGI(TAG, "mqttConnectBits=%x", mqttConnectBits);
+		ESP_LOGI(TAG, "mqttConnectBits=0x%"PRIx32, mqttConnectBits);
 		if (mqttConnectBits & MQTT_CONNECTED_BIT) {
 
 #if CONFIG_ENABLE_FLASH
