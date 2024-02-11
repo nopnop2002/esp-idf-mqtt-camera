@@ -145,7 +145,7 @@ ESP32-CAM by AI-Thinker have flash light on GPIO4.
 ![config-flash](https://user-images.githubusercontent.com/6020549/122479023-6b630f00-d005-11eb-98cc-b5fdbf2987c7.jpg)
 
 
-# View pictures using python   
+# View pictures using opencv-python   
 You can use subscribe.py as image viewer.   
 ```
 python3 -m pip install -U wheel
