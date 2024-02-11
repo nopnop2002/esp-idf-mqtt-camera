@@ -163,6 +163,7 @@ options:
   --output OUTPUT  output file name
 ```
 
+![opencv](https://github.com/nopnop2002/esp-idf-mqtt-camera/assets/6020549/0f59f57c-1565-4343-b1bf-4c0030d56f24)
 
 # Save pictures using node.js   
 You can use saveFile.js to save pictures.   
