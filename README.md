@@ -1,6 +1,6 @@
 # esp-idf-mqtt-camera
 Take a picture and Publish it via MQTT.   
-This project use [ESP32 Camera Driver](https://github.com/espressif/esp32-camera).
+This project use [ESP32 Camera Driver](https://components.espressif.com/components/espressif/esp32-camera).   
 
 ![slide0001](https://user-images.githubusercontent.com/6020549/123804185-f73f3a00-d927-11eb-9bf8-918595583c1a.jpg)
 ![slide0002](https://user-images.githubusercontent.com/6020549/123804188-f8706700-d927-11eb-83ed-65d3aaf2a335.jpg)
@@ -8,7 +8,12 @@ This project use [ESP32 Camera Driver](https://github.com/espressif/esp32-camera
 # Hardware requirements
 ESP32 development board with OV2640 camera.   
 If you use other camera, edit sdkconfig.default.   
-![ESP32-Camera-board](https://user-images.githubusercontent.com/6020549/198520670-27ea9bd1-71d8-438f-be58-8516154be4af.JPG)
+From the left:   
+- Aithinker ESP32-CAM   
+- Freenove ESP32-WROVER CAM   
+- UICPAL ESPS3 CAM   
+
+![UICPAL-ESP32-S3-3](https://github.com/nopnop2002/esp-idf-mqtt-camera/assets/6020549/b48f5b55-3de8-4d28-8031-7b538e7f0b43)
 
 # Software requirements
 esp-idf v4.4/v5.0.   
@@ -28,7 +33,6 @@ For AiThinker ESP32-CAM, You have to use a USB-TTL converter.
 ```
 git clone https://github.com/nopnop2002/esp-idf-mqtt-camera
 cd esp-idf-mqtt-camera
-git clone https://github.com/espressif/esp32-camera components/esp32-camera
 idf.py set-target esp32
 idf.py menuconfig
 idf.py flash monitor
@@ -85,7 +89,7 @@ You can download the MQTT broker from [here](https://github.com/nopnop2002/esp-i
 
 
 ## Select Board
-![config-board](https://user-images.githubusercontent.com/6020549/200430994-9176ffbe-d71d-4601-a2cc-69de0cf833af.jpg)
+![config-board](https://github.com/nopnop2002/esp-idf-mqtt-camera/assets/6020549/632305c3-c992-4a49-b361-5fd18b79d629)
 
 
 ## Select Frame Size
@@ -142,13 +146,21 @@ ESP32-CAM by AI-Thinker have flash light on GPIO4.
 
 
 # View pictures using python   
-You can use subscribe.py as viewer.   
+You can use subscribe.py as image viewer.   
 ```
 python3 -m pip install -U wheel
-python3 -m pip install paho-mqtt
+python3 -m pip install 'paho-mqtt>=1.0.0,<2.0.0'
 python3 -m pip install opencv-python
 python3 -m pip install numpy
-python3 ./subscribe.py
+python3 ./subscribe.py --help
+usage: subscribe.py [-h] [--host HOST] [--port PORT] [--topic TOPIC] [--output OUTPUT]
+
+options:
+  -h, --help       show this help message and exit
+  --host HOST      mqtt broker
+  --port PORT      mqtt port
+  --topic TOPIC    mqtt topic
+  --output OUTPUT  output file name
 ```
 
 

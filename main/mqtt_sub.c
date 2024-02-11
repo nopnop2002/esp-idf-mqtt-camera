@@ -151,10 +151,8 @@ void mqtt_sub(void *pvParameters)
 
 		if (mqttBuf.event_id == MQTT_EVENT_CONNECTED) {
 			esp_mqtt_client_subscribe(mqtt_client, CONFIG_SUB_TOPIC, 0);
-#if 0
 		} else if (mqttBuf.event_id == MQTT_EVENT_DISCONNECTED) {
-			break;
-#endif
+			esp_mqtt_client_reconnect(mqtt_client);
 		} else if (mqttBuf.event_id == MQTT_EVENT_DATA) {
 			ESP_LOGI(TAG, "TOPIC=%.*s\r", mqttBuf.topic_len, mqttBuf.topic);
 			ESP_LOGI(TAG, "DATA=%.*s\r", mqttBuf.data_len, mqttBuf.data);

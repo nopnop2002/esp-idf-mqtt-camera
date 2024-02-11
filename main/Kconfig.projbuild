@@ -76,14 +76,18 @@ menu "Application Configuration"
 		help
 			Select Board Type.
 
-		config BOARD_WROVER_KIT
+		config BOARD_ESP32_WROVER_FREENOVE
 			bool "Freenove ESP32-WROVER CAM Board"
+		config BOARD_ESP32S3_WROOM_FREENOVE
+			bool "Freenove ESP32S3-WROOM CAM Board"
 		config BOARD_CAMERA_MODEL_ESP_EYE
 			bool "Espressif ESP-EYE"
 		config BOARD_ESP32CAM_AITHINKER
 			bool "AiThinker ESP32-CAM"
 		config BOARD_CAMERA_MODEL_TTGO_T_JOURNAL
 			bool "TTGO T-Journal ESP32 Camera"
+		config BOARD_ESPS3_CAM_UICPAL
+			bool "UICPAL ESPS3 CAM RE:1.0"
 	endchoice
 
 	choice FRAMESIZE
@@ -129,16 +133,16 @@ menu "Application Configuration"
 		endchoice
 
 		config GPIO_INPUT
-			int "Input GPIO number"
 			depends on SHUTTER_GPIO
+			int "Input GPIO number"
 			range 4 34
 			default 15
 			help
 				GPIO number (IOxx) to Button Input.
 
 		choice GPIO_INITIAL
-			prompt "GPIO Initial state"
 			depends on SHUTTER_GPIO
+			prompt "GPIO Initial state"
 			default GPIO_PULLDOWN
 			help
 				Select initial state of GPIO.
@@ -156,8 +160,8 @@ menu "Application Configuration"
 		endchoice
 
 		config SUB_TOPIC
-			string "Subscribe Topic"
 			depends on SHUTTER_MQTT
+			string "Subscribe Topic"
 			default "/take/picture"
 			help
 				Topic of subscribe
@@ -170,8 +174,8 @@ menu "Application Configuration"
 			Enable Flash Light.
 
 	config GPIO_FLASH
-		int "Flash GPIO number"
 		depends on ENABLE_FLASH
+		int "Flash GPIO number"
 		range 4 34
 		default 4
 		help

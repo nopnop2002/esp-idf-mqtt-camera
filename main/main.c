@@ -345,8 +345,6 @@ void convert_mdns_host(char * from, char * to)
 }
 
 
-//void mqtt_pub(void *pvParameters);
-
 #if CONFIG_SHUTTER_ENTER
 void keyin(void *pvParameters);
 #endif
@@ -410,19 +408,16 @@ void app_main(void)
 #endif
 
 #if CONFIG_SHUTTER_MQTT
-#define SHUTTER "MQTT Input"
+#define SHUTTER "MQTT Subscrive"
 	xTaskCreate(mqtt_sub, "SUB", 1024*4, NULL, 2, NULL);
 #endif
 
 	/* Get the local IP address */
-	//tcpip_adapter_ip_info_t ip_info;
-	//ESP_ERROR_CHECK(tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info));
 	esp_netif_ip_info_t ip_info;
 	ESP_ERROR_CHECK(esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ip_info));
 
 	/* Create HTTP Task */
 	char cparam0[64];
-	//sprintf(cparam0, "%s", ip4addr_ntoa(&ip_info.ip));
 	sprintf(cparam0, IPSTR, IP2STR(&ip_info.ip));
 	xTaskCreate(http_task, "HTTP", 1024*6, (void *)cparam0, 2, NULL);
 
