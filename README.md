@@ -181,8 +181,10 @@ Read [this](https://github.com/nopnop2002/esp-idf-mqtt-camera/tree/master/dash).
 
 
 # Built-in WEB Server
+ESP32 works as a web server.   
 You can check the photos taken using the built-in WEB server.   
 Enter the ESP32's IP address and port number in the address bar of your browser.   
+You can connect using mDNS hostname instead of IP address.   
 
 ![browser](https://user-images.githubusercontent.com/6020549/124227364-837a7880-db45-11eb-9d8b-fa15c676adac.jpg)
 
