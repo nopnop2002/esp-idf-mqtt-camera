@@ -24,8 +24,6 @@
 #include "esp_spiffs.h" 
 #include "esp_sntp.h"
 #include "mdns.h"
-#include "netdb.h" // gethostbyname
-#include "lwip/dns.h"
 #include "mqtt_client.h"
 
 #include "esp_camera.h"
@@ -369,8 +367,10 @@ void app_main(void)
 	}
 	ESP_ERROR_CHECK(ret);
 
-	ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
+	// Initialize WiFi
 	wifi_init_sta();
+
+	// Initialize mDNS
 	initialise_mdns();
 
 	char *partition_label = "storage";
