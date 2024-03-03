@@ -12,8 +12,9 @@ From the left:
 - Aithinker ESP32-CAM   
 - Freenove ESP32-WROVER CAM   
 - UICPAL ESPS3 CAM   
+- Freenove ESP32S3-WROVER CAM (Clone)   
 
-![UICPAL-ESP32-S3-3](https://github.com/nopnop2002/esp-idf-mqtt-camera/assets/6020549/b48f5b55-3de8-4d28-8031-7b538e7f0b43)
+![es32-camera](https://github.com/nopnop2002/esp-idf-websocket-camera/assets/6020549/38dbef9a-ed85-4df2-8d22-499b2b497278)
 
 # Software requirements
 esp-idf v4.4/v5.0.   
@@ -137,13 +138,15 @@ You can use mosquitto_pub as shutter.
 mosquitto_pub -h your_broker -p 1883 -t "/take/picture" -m ""
 ```
 
-
-## Flash Light
-
+## Flash Light   
 ESP32-CAM by AI-Thinker have flash light on GPIO4.   
 
 ![config-flash](https://user-images.githubusercontent.com/6020549/122479023-6b630f00-d005-11eb-98cc-b5fdbf2987c7.jpg)
 
+## PSRAM   
+When you use ESP32S3-WROVER CAM, you need to set the PSRAM type.   
+
+![config-psram](https://github.com/nopnop2002/esp-idf-websocket-camera/assets/6020549/ba04f088-c628-46ac-bc5b-2968032753e0)
 
 # View pictures using opencv-python   
 You can use subscribe.py as image viewer.   
