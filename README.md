@@ -159,6 +159,7 @@ python3 -m pip install -U wheel
 python3 -m pip install 'paho-mqtt>=1.0.0,<2.0.0'
 python3 -m pip install opencv-python
 python3 -m pip install numpy
+
 python3 ./subscribe.py --help
 usage: subscribe.py [-h] [--host HOST] [--port PORT] [--topic TOPIC] [--output OUTPUT]
 
