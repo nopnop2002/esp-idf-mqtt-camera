@@ -69,6 +69,8 @@ MQTT broker is specified by one of the following.
 - Fully Qualified Domain Name   
  ```broker.emqx.io```
 
+jpeg files are sent as multiple messages.   
+When using a public broker like broker.emqx.io, some messages may be missing.   
 You can download the MQTT broker from [here](https://github.com/nopnop2002/esp-idf-mqtt-broker).   
 
 ![config-mqtt](https://user-images.githubusercontent.com/6020549/194732213-8f7291e7-75b5-46c0-918d-c8002d19e1ff.jpg)
