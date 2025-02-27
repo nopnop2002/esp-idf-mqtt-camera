@@ -1,9 +1,11 @@
 /* 
-   This code is in the Public Domain (or CC0 licensed, at your option.)
+	Take a picture and Publish it via MQTT Publish.
 
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
+	This code is in the Public Domain (or CC0 licensed, at your option.)
+
+	Unless required by applicable law or agreed to in writing, this
+	software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+	CONDITIONS OF ANY KIND, either express or implied.
 */
 
 #include <stdio.h>
@@ -96,8 +98,7 @@ static esp_err_t init_camera(int framesize)
 	return ESP_OK;
 }
 
-static void event_handler(void* arg, esp_event_base_t event_base,
-								int32_t event_id, void* event_data)
+static void event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
 	if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
 		esp_wifi_connect();
@@ -118,15 +119,9 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 	}
 }
 
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
-#else
-static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
-#endif
 {
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 	esp_mqtt_event_handle_t event = event_data;
-#endif
 	switch (event->event_id) {
 		case MQTT_EVENT_CONNECTED:
 			ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
@@ -155,16 +150,26 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
 			ESP_LOGI(TAG, "Other event id:%d", event->event_id);
 			break;
 	}
-#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
-	return ESP_OK;
-#endif
+	return;
 }
 
-void wifi_init_sta()
+#if CONFIG_STATIC_IP
+static esp_err_t example_set_dns_server(esp_netif_t *netif, uint32_t addr, esp_netif_dns_type_t type)
+{
+	if (addr && (addr != IPADDR_NONE)) {
+		esp_netif_dns_info_t dns;
+		dns.ip.u_addr.ip4.addr = addr;
+		dns.ip.type = IPADDR_TYPE_V4;
+		ESP_ERROR_CHECK(esp_netif_set_dns_info(netif, type, &dns));
+	}
+	return ESP_OK;
+}
+#endif
+
+esp_err_t wifi_init_sta()
 {
 	s_wifi_event_group = xEventGroupCreate();
 
-	ESP_LOGI(TAG,"ESP-IDF esp_netif");
 	ESP_ERROR_CHECK(esp_netif_init());
 	ESP_ERROR_CHECK(esp_event_loop_create_default());
 	esp_netif_t *netif = esp_netif_create_default_wifi_sta();
@@ -186,31 +191,29 @@ void wifi_init_sta()
 	ip_info.ip.addr = ipaddr_addr(CONFIG_STATIC_IP_ADDRESS);
 	ip_info.netmask.addr = ipaddr_addr(CONFIG_STATIC_NM_ADDRESS);
 	ip_info.gw.addr = ipaddr_addr(CONFIG_STATIC_GW_ADDRESS);;
-	esp_netif_set_ip_info(netif, &ip_info);
+	ESP_ERROR_CHECK(esp_netif_set_ip_info(netif, &ip_info));
 
-	/*
-	I referred from here.
-	https://www.esp32.com/viewtopic.php?t=5380
-
-	if we should not be using DHCP (for example we are using static IP addresses),
-	then we need to instruct the ESP32 of the locations of the DNS servers manually.
-	Google publicly makes available two name servers with the addresses of 8.8.8.8 and 8.8.4.4.
-	*/
-
-	ip_addr_t d;
-	d.type = IPADDR_TYPE_V4;
-	d.u_addr.ip4.addr = 0x08080808; //8.8.8.8 dns
-	dns_setserver(0, &d);
-	d.u_addr.ip4.addr = 0x08080404; //8.8.4.4 dns
-	dns_setserver(1, &d);
+	/* Set DNS Server */
+	ESP_ERROR_CHECK(example_set_dns_server(netif, ipaddr_addr("8.8.8.8"), ESP_NETIF_DNS_MAIN));
+	ESP_ERROR_CHECK(example_set_dns_server(netif, ipaddr_addr("8.8.4.4"), ESP_NETIF_DNS_BACKUP));
 
 #endif // CONFIG_STATIC_IP
 
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 	ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
-	ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
-	ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler, NULL));
+	esp_event_handler_instance_t instance_any_id;
+	esp_event_handler_instance_t instance_got_ip;
+	ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT,
+		ESP_EVENT_ANY_ID,
+		&event_handler,
+		NULL,
+		&instance_any_id));
+	ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT,
+		IP_EVENT_STA_GOT_IP,
+		&event_handler,
+		NULL,
+		&instance_got_ip));
 
 	wifi_config_t wifi_config = {
 		.sta = {
@@ -218,32 +221,37 @@ void wifi_init_sta()
 			.password = CONFIG_ESP_WIFI_PASSWORD
 		},
 	};
-	ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA) );
-	ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config) );
-	ESP_ERROR_CHECK(esp_wifi_start() );
-
-	ESP_LOGI(TAG, "wifi_init_sta finished.");
+	ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
+	ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+	ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
+	ESP_ERROR_CHECK(esp_wifi_start());
 
 	/* Waiting until either the connection is established (WIFI_CONNECTED_BIT) or connection failed for the maximum
 	 * number of re-tries (WIFI_FAIL_BIT). The bits are set by event_handler() (see above) */
+	esp_err_t ret_value = ESP_OK;
 	EventBits_t bits = xEventGroupWaitBits(s_wifi_event_group,
-			WIFI_CONNECTED_BIT | WIFI_FAIL_BIT,
-			pdFALSE,
-			pdFALSE,
-			portMAX_DELAY);
+		WIFI_CONNECTED_BIT | WIFI_FAIL_BIT,
+		pdFALSE,
+		pdFALSE,
+		portMAX_DELAY);
 
 	/* xEventGroupWaitBits() returns the bits before the call returned, hence we can test which event actually
 	 * happened. */
 	if (bits & WIFI_CONNECTED_BIT) {
-		ESP_LOGI(TAG, "connected to ap SSID:%s password:%s",
-				 CONFIG_ESP_WIFI_SSID, CONFIG_ESP_WIFI_PASSWORD);
+		ESP_LOGI(TAG, "connected to ap SSID:%s password:%s", CONFIG_ESP_WIFI_SSID, CONFIG_ESP_WIFI_PASSWORD);
 	} else if (bits & WIFI_FAIL_BIT) {
-		ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s",
-				 CONFIG_ESP_WIFI_SSID, CONFIG_ESP_WIFI_PASSWORD);
+		ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s", CONFIG_ESP_WIFI_SSID, CONFIG_ESP_WIFI_PASSWORD);
+		ret_value = ESP_FAIL;
 	} else {
 		ESP_LOGE(TAG, "UNEXPECTED EVENT");
+		ret_value = ESP_FAIL;
 	}
+
+	/* The event will not be processed after unregister */
+	ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, instance_got_ip));
+	ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, instance_any_id));
 	vEventGroupDelete(s_wifi_event_group);
+	return ret_value;
 }
 
 void initialise_mdns(void)
@@ -323,26 +331,26 @@ esp_err_t query_mdns_host(const char * host_name, char *ip)
 
 void convert_mdns_host(char * from, char * to)
 {
-    ESP_LOGI(__FUNCTION__, "from=[%s]",from);
-    strcpy(to, from);
-    char *sp;
-    sp = strstr(from, ".local");
-    if (sp == NULL) return;
+	ESP_LOGI(__FUNCTION__, "from=[%s]",from);
+	strcpy(to, from);
+	char *sp;
+	sp = strstr(from, ".local");
+	if (sp == NULL) return;
 
-    int _len = sp - from;
-    ESP_LOGD(__FUNCTION__, "_len=%d", _len);
-    char _from[128];
-    strcpy(_from, from);
-    _from[_len] = 0;
-    ESP_LOGI(__FUNCTION__, "_from=[%s]", _from);
+	int _len = sp - from;
+	ESP_LOGD(__FUNCTION__, "_len=%d", _len);
+	char _from[128];
+	strcpy(_from, from);
+	_from[_len] = 0;
+	ESP_LOGI(__FUNCTION__, "_from=[%s]", _from);
 
-    char _ip[128];
-    esp_err_t ret = query_mdns_host(_from, _ip);
-    ESP_LOGI(__FUNCTION__, "query_mdns_host=%d _ip=[%s]", ret, _ip);
-    if (ret != ESP_OK) return;
+	char _ip[128];
+	esp_err_t ret = query_mdns_host(_from, _ip);
+	ESP_LOGI(__FUNCTION__, "query_mdns_host=%d _ip=[%s]", ret, _ip);
+	if (ret != ESP_OK) return;
 
-    strcpy(to, _ip);
-    ESP_LOGI(__FUNCTION__, "to=[%s]", to);
+	strcpy(to, _ip);
+	ESP_LOGI(__FUNCTION__, "to=[%s]", to);
 }
 
 
@@ -354,6 +362,14 @@ void keyin(void *pvParameters);
 void gpio(void *pvParameters);
 #endif
 
+#if CONFIG_SHUTTER_TCP
+void tcp_server(void *pvParameters);
+#endif
+
+#if CONFIG_SHUTTER_UDP
+void udp_server(void *pvParameters);
+#endif
+
 #if CONFIG_SHUTTER_MQTT
 void mqtt_sub(void *pvParameters);
 #endif
@@ -362,7 +378,7 @@ void http_task(void *pvParameters);
 
 void app_main(void)
 {
-	//Initialize NVS
+	// Initialize NVS
 	esp_err_t ret = nvs_flash_init();
 	if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
 	  ESP_ERROR_CHECK(nvs_flash_erase());
@@ -371,7 +387,7 @@ void app_main(void)
 	ESP_ERROR_CHECK(ret);
 
 	// Initialize WiFi
-	wifi_init_sta();
+	ESP_ERROR_CHECK(wifi_init_sta());
 
 	// Initialize mDNS
 	initialise_mdns();
@@ -383,7 +399,6 @@ void app_main(void)
 		ESP_LOGE(TAG, "mountSPIFFS fail");
 		while(1) { vTaskDelay(1); }
 	}
-
 
 #if CONFIG_ENABLE_FLASH
 	// Enable Flash Light
@@ -408,6 +423,16 @@ void app_main(void)
 #if CONFIG_SHUTTER_GPIO
 #define SHUTTER "GPIO Input"
 	xTaskCreate(gpio, "GPIO", 1024*4, NULL, 2, NULL);
+#endif
+
+#if CONFIG_SHUTTER_TCP
+#define SHUTTER "TCP Input"
+	xTaskCreate(tcp_server, "TCP", 1024*4, NULL, 2, NULL);
+#endif
+
+#if CONFIG_SHUTTER_UDP
+#define SHUTTER "UDP Input"
+	xTaskCreate(udp_server, "UDP", 1024*4, NULL, 2, NULL);
 #endif
 
 #if CONFIG_SHUTTER_MQTT
@@ -447,24 +472,13 @@ void app_main(void)
 	sprintf(uri, "mqtt://%s", ip);
 	ESP_LOGI(TAG, "uri=[%s]", uri);
 
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 	esp_mqtt_client_config_t mqtt_cfg = {
 		.broker.address.uri = uri,
 		.credentials.client_id = client_id
 	};
-#else
-	esp_mqtt_client_config_t mqtt_cfg = {
-		.uri = uri,
-		.event_handle = mqtt_event_handler,
-		.client_id = client_id
-	};
-#endif
 
 	esp_mqtt_client_handle_t mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
-
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 	esp_mqtt_client_register_event(mqtt_client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
-#endif
 
 	esp_mqtt_client_start(mqtt_client);
 

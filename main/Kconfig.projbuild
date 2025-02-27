@@ -127,6 +127,10 @@ menu "Application Configuration"
 				bool "Use Enter key"
 			config SHUTTER_GPIO
 				bool "Use GPIO"
+			config SHUTTER_TCP
+				bool "Use TCP Socket"
+			config SHUTTER_UDP
+				bool "Use UDP Socket"
 			config SHUTTER_MQTT
 				bool "Use MQTT Subscribe"
 
@@ -158,6 +162,22 @@ menu "Application Configuration"
 					The initial state of GPIO is Pull-Down.
 
 		endchoice
+
+		config TCP_PORT
+			depends on SHUTTER_TCP
+			int "TCP Port"
+			range 49152 65535
+			default 49876
+			help
+				Local port TCP server will listen on.
+
+		config UDP_PORT
+			depends on SHUTTER_UDP
+			int "UDP Port"
+			range 49152 65535
+			default 49876
+			help
+				Local port UDP server will listen on.
 
 		config SUB_TOPIC
 			depends on SHUTTER_MQTT

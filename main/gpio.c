@@ -9,8 +9,6 @@
 #include "esp_log.h"
 #include "cmd.h"
 
-#if CONFIG_SHUTTER_GPIO
-
 extern QueueHandle_t xQueueCmd;
 
 static const char *TAG = "GPIO";
@@ -59,4 +57,3 @@ void gpio(void *pvParameter)
 	/* Never reach */
 	vTaskDelete( NULL );
 }
-#endif

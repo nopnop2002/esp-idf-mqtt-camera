@@ -1,4 +1,15 @@
-set(COMPONENT_SRCS "main.c" "keyboard.c" "gpio.c" "mqtt_sub.c" "http_server.c")
-set(COMPONENT_ADD_INCLUDEDIRS ".")
+set(srcs "main.c" "http_server.c")
 
-register_component()
+if (CONFIG_SHUTTER_ENTER)
+	list(APPEND srcs "keyboard.c")
+elseif (CONFIG_SHUTTER_GPIO)
+	list(APPEND srcs "gpio.c")
+elseif (CONFIG_SHUTTER_TCP)
+	list(APPEND srcs "tcp_server.c")
+elseif (CONFIG_SHUTTER_UDP)
+	list(APPEND srcs "udp_server.c")
+elseif (CONFIG_SHUTTER_MQTT)
+	list(APPEND srcs "mqtt_sub.c")
+endif()
+
+idf_component_register(SRCS "${srcs}" INCLUDE_DIRS ".")

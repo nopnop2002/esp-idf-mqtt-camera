@@ -118,6 +118,24 @@ You can choose one of the following shutter methods
 
 	![config-shutter-2](https://user-images.githubusercontent.com/6020549/99891859-c15f1680-2cb1-11eb-8204-2eced32c3d81.jpg)
 
+- Shutter is TCP Socket   
+	ESP32 acts as a TCP server and listens for requests from TCP clients.   
+	You can use tcp_send.py as shutter.   
+	`python3 ./tcp_send.py`
+	![Image](https://github.com/user-attachments/assets/4c301018-2f8c-4644-be3f-417222fb1842)
+
+- Shutter is UDP Socket   
+	ESP32 acts as a UDP listener and listens for requests from UDP clients.   
+	You can use this command as shutter.   
+	`echo -n "take" | socat - UDP-DATAGRAM:255.255.255.255:49876,broadcast`   
+	You can use udp_send.py as shutter.   
+	Requires netifaces.   
+	`python3 ./udp_send.py`   
+	![Image](https://github.com/user-attachments/assets/3dcd72be-d0ef-4bd9-9273-f420ca88f11b)   
+	You can use these devices as shutters.   
+	![Image](https://github.com/user-attachments/assets/cc97da4e-6c06-4604-8362-f81c6fb6eb58)   
+	Click [here](https://github.com/nopnop2002/esp-idf-selfie-trigger) for details.   
+
 - Shutter is MQTT Publish   
 	You can use mosquitto_pub as shutter.   
 	```

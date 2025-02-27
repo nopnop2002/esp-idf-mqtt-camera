@@ -23,24 +23,14 @@
 #include "cmd.h"
 #include "mqtt.h"
 
-#if CONFIG_SHUTTER_MQTT
-
 static const char *TAG = "SUB";
 
 extern QueueHandle_t xQueueCmd;
 
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
-#else
-static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
-#endif
 {
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 	esp_mqtt_event_handle_t event = event_data;
 	MQTT_t *mqttBuf = handler_args;
-#else
-	MQTT_t *mqttBuf = event->user_context;
-#endif
 	ESP_LOGI(TAG, "taskHandle=0x%x", (unsigned int)mqttBuf->taskHandle);
 	mqttBuf->event_id = event->event_id;
 	switch (event->event_id) {
@@ -86,9 +76,7 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
 			ESP_LOGI(TAG, "Other event id:%d", event->event_id);
 			break;
 	}
-#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
-	return ESP_OK;
-#endif
+	return;
 }
 
 esp_err_t query_mdns_host(const char * host_name, char *ip);
@@ -120,25 +108,13 @@ void mqtt_sub(void *pvParameters)
 
 	MQTT_t mqttBuf;
 	mqttBuf.taskHandle = xTaskGetCurrentTaskHandle();
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 	esp_mqtt_client_config_t mqtt_cfg = {
 		.broker.address.uri = uri,
 		.credentials.client_id = client_id
 	};
-#else
-	esp_mqtt_client_config_t mqtt_cfg = {
-		.user_context = &mqttBuf,
-		.uri = uri,
-		.event_handle = mqtt_event_handler,
-		.client_id = client_id
-	};
-#endif
 
 	esp_mqtt_client_handle_t mqtt_client = esp_mqtt_client_init(&mqtt_cfg);
-
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 	esp_mqtt_client_register_event(mqtt_client, ESP_EVENT_ANY_ID, mqtt_event_handler, &mqttBuf);
-#endif
 
 	esp_mqtt_client_start(mqtt_client);
 
@@ -168,4 +144,3 @@ void mqtt_sub(void *pvParameters)
 	esp_mqtt_client_stop(mqtt_client);
 	vTaskDelete(NULL);
 }
-#endif
