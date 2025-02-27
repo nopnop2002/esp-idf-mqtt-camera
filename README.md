@@ -1,6 +1,6 @@
 # esp-idf-mqtt-camera
 Take a picture and Publish it via MQTT.   
-This project use [ESP32 Camera Driver](https://components.espressif.com/components/espressif/esp32-camera).   
+This project use [this](https://components.espressif.com/components/espressif/esp32-camera) Camera Driver.   
 
 ![slide0001](https://user-images.githubusercontent.com/6020549/123804185-f73f3a00-d927-11eb-9bf8-918595583c1a.jpg)
 ![slide0002](https://user-images.githubusercontent.com/6020549/123804188-f8706700-d927-11eb-83ed-65d3aaf2a335.jpg)
