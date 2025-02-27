@@ -91,43 +91,40 @@ Large frame sizes take longer to take a picture.
 You can choose one of the following shutter methods
 
 - Shutter is the Enter key on the keyboard   
- For operation check.   
- When using the USB port provided by the USB Serial/JTAG Controller Console, you need to enable the following line in sdkconfig.
- ```
- CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
- ```
-
-![config-shutter-1](https://user-images.githubusercontent.com/6020549/99891847-b73d1800-2cb1-11eb-84c0-2d6c6d85c010.jpg)
+	For operation check.   
+	When using the USB port provided by the USB Serial/JTAG Controller Console, you need to enable the following line in sdkconfig.
+	```
+	CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+	```
+	![config-shutter-1](https://user-images.githubusercontent.com/6020549/99891847-b73d1800-2cb1-11eb-84c0-2d6c6d85c010.jpg)
 
 - Shutter is a GPIO toggle
 
-  - Initial Sate is PULLDOWN   
-The shutter is prepared when it is turned from OFF to ON, and a picture is taken when it is turned from ON to OFF.   
+	- Initial Sate is PULLDOWN   
+		The shutter is prepared when it is turned from OFF to ON, and a picture is taken when it is turned from ON to OFF.   
 
-  - Initial Sate is PULLUP   
-The shutter is prepared when it is turned from ON to OFF, and a picture is taken when it is turned from OFF to ON.   
+	- Initial Sate is PULLUP   
+	The shutter is prepared when it is turned from ON to OFF, and a picture is taken when it is turned from OFF to ON.   
 
-I confirmed that the following GPIO can be used.   
+	I confirmed that the following GPIO can be used.   
 
-|GPIO|PullDown|PullUp|
-|:-:|:-:|:-:|
-|GPIO12|OK|NG|
-|GPIO13|OK|OK|
-|GPIO14|OK|OK|
-|GPIO15|OK|OK|
-|GPIO16|NG|NG|
+	|GPIO|PullDown|PullUp|
+	|:-:|:-:|:-:|
+	|GPIO12|OK|NG|
+	|GPIO13|OK|OK|
+	|GPIO14|OK|OK|
+	|GPIO15|OK|OK|
+	|GPIO16|NG|NG|
 
-![config-shutter-2](https://user-images.githubusercontent.com/6020549/99891859-c15f1680-2cb1-11eb-8204-2eced32c3d81.jpg)
+	![config-shutter-2](https://user-images.githubusercontent.com/6020549/99891859-c15f1680-2cb1-11eb-8204-2eced32c3d81.jpg)
 
 - Shutter is MQTT Publish   
+	You can use mosquitto_pub as shutter.   
+	```
+	mosquitto_pub -h your_broker -p 1883 -t "/take/picture" -m ""
+	```
+	![config-shutter-3](https://user-images.githubusercontent.com/6020549/200434412-adecbc77-7ba6-4520-9731-cc3eec301b84.jpg)
 
-![config-shutter-3](https://user-images.githubusercontent.com/6020549/200434412-adecbc77-7ba6-4520-9731-cc3eec301b84.jpg)
-
-You can use mosquitto_pub as shutter.   
-
-```
-mosquitto_pub -h your_broker -p 1883 -t "/take/picture" -m ""
-```
 
 ## Flash Light   
 ESP32-CAM by AI-Thinker have flash light on GPIO4.   
