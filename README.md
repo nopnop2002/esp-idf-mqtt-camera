@@ -173,7 +173,7 @@ options:
   --topic TOPIC    mqtt topic
   --output OUTPUT  output file name
 ```
-Close the image window with the ESC key.   
+__Close the image window with the ESC key.__   
 ![opencv](https://github.com/nopnop2002/esp-idf-mqtt-camera/assets/6020549/516b2f25-d285-47d6-ae56-ee1cceed5c58)
 
 # Save pictures using node.js   
