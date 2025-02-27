@@ -137,6 +137,7 @@ You can choose one of the following shutter methods
 	Click [here](https://github.com/nopnop2002/esp-idf-selfie-trigger) for details.   
 
 - Shutter is MQTT Publish   
+	ESP32 acts as an MQTT subscriber and listens to requests from MQTT publishes.   
 	You can use mosquitto_pub as shutter.   
 	```
 	mosquitto_pub -h your_broker -p 1883 -t "/take/picture" -m ""
