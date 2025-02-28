@@ -44,20 +44,16 @@ idf.py flash monitor
 For AiThinker ESP32-CAM, Change GPIO0 to open and press the RESET button.
 
 # Configuration
-Set the following items using menuconfig.
-
 ![config-main](https://user-images.githubusercontent.com/6020549/99891822-7f35d500-2cb1-11eb-928c-be9a8191dec9.jpg)
 ![config-app](https://user-images.githubusercontent.com/6020549/200430857-7ae56376-038e-40ea-a694-15f49948e27b.jpg)
 
 ## Wifi Setting
-
-![config-wifi-1](https://user-images.githubusercontent.com/6020549/182987385-b885f6d2-f52a-4fc3-a338-c089547703a1.jpg)
-
+Set the information of your access point.   
+![config-wifi-1](https://user-images.githubusercontent.com/6020549/182987385-b885f6d2-f52a-4fc3-a338-c089547703a1.jpg)   
 You can connect using the mDNS hostname instead of the IP address.   
-![config-wifi-2](https://user-images.githubusercontent.com/6020549/182987378-4074dc87-05b6-4102-baf9-c0428eb54321.jpg)
-
+![config-wifi-2](https://user-images.githubusercontent.com/6020549/182987378-4074dc87-05b6-4102-baf9-c0428eb54321.jpg)   
 You can use static IP.   
-![config-wifi-3](https://user-images.githubusercontent.com/6020549/182987383-74bc02d7-678f-4aa3-87b1-41d3e99f279e.jpg)
+![config-wifi-3](https://user-images.githubusercontent.com/6020549/182987383-74bc02d7-678f-4aa3-87b1-41d3e99f279e.jpg)   
 
 
 ## MQTT Server Setting
