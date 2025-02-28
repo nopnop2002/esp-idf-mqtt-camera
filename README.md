@@ -4,6 +4,7 @@ This project use [this](https://components.espressif.com/components/espressif/es
 
 ![slide0001](https://user-images.githubusercontent.com/6020549/123804185-f73f3a00-d927-11eb-9bf8-918595583c1a.jpg)
 ![slide0002](https://user-images.githubusercontent.com/6020549/123804188-f8706700-d927-11eb-83ed-65d3aaf2a335.jpg)
+![Image](https://github.com/user-attachments/assets/f83549a1-bfd7-4662-9e43-d532a8fac0e1)
 
 # Hardware requirements
 ESP32 development board with OV2640 camera.   
