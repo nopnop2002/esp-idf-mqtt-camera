@@ -161,16 +161,20 @@ python3 -m pip install 'paho-mqtt>=1.0.0,<2.0.0'
 python3 -m pip install opencv-python
 
 python3 ./subscribe.py --help
-usage: subscribe.py [-h] [--host HOST] [--port PORT] [--topic TOPIC] [--output OUTPUT]
+usage: subscribe.py [-h] [--host HOST] [--port PORT] [--topic TOPIC] [--output OUTPUT] [--timeout TIMEOUT]
 
 options:
-  -h, --help       show this help message and exit
-  --host HOST      mqtt broker
-  --port PORT      mqtt port
-  --topic TOPIC    mqtt topic
-  --output OUTPUT  output file name
+  -h, --help         show this help message and exit
+  --host HOST        mqtt broker
+  --port PORT        mqtt port
+  --topic TOPIC      mqtt topic
+  --output OUTPUT    output file name
+  --timeout TIMEOUT  wait time for keyboard input[sec]
 ```
-__Close the image window with the ESC key.__   
+
+When timeout is specified, display the image for the specified number of seconds.   
+When timeout is not specified, the image will be displayed until the ESC key is pressed.   
+__Close the image window with the ESC key. Do not use the close button.__   
 ![opencv](https://github.com/nopnop2002/esp-idf-mqtt-camera/assets/6020549/516b2f25-d285-47d6-ae56-ee1cceed5c58)   
 This script works not only on Linux but also on Windows 10.   
 I used Python 3.9.13 for Windows.   
