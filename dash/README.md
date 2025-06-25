@@ -13,7 +13,7 @@ You can download from [Google Play](https://play.google.com/store/apps/details?i
 # Setup Dash board   
 
 ## Setup Broker
-I use local server as broker.   
+I use local server (192.168.10.40) as broker.   
 
 ![broker](https://user-images.githubusercontent.com/6020549/188520878-705e04fb-c902-44e6-bf7b-a0715846b482.jpg)
 
