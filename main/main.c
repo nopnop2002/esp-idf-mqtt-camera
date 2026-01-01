@@ -223,7 +223,7 @@ esp_err_t wifi_init_sta()
 	};
 	ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
 	ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-	ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
+	ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
 	ESP_ERROR_CHECK(esp_wifi_start());
 
 	/* Waiting until either the connection is established (WIFI_CONNECTED_BIT) or connection failed for the maximum
@@ -317,10 +317,10 @@ esp_err_t query_mdns_host(const char * host_name, char *ip)
 	esp_err_t err = mdns_query_a(host_name, 10000,	&addr);
 	if(err){
 		if(err == ESP_ERR_NOT_FOUND){
-			ESP_LOGW(__FUNCTION__, "%s: Host was not found!", esp_err_to_name(err));
-			return ESP_FAIL;
+			ESP_LOGW(__FUNCTION__, "%s: Host was not found!", host_name);
+		} else {
+			ESP_LOGE(__FUNCTION__, "Query Failed: %s", esp_err_to_name(err));
 		}
-		ESP_LOGE(__FUNCTION__, "Query Failed: %s", esp_err_to_name(err));
 		return ESP_FAIL;
 	}
 
@@ -394,11 +394,7 @@ void app_main(void)
 
 	char *partition_label = "storage";
 	char *base_path = "/spiffs"; 
-	ret = mountSPIFFS(partition_label, base_path);
-	if (ret != ESP_OK) {
-		ESP_LOGE(TAG, "mountSPIFFS fail");
-		while(1) { vTaskDelay(1); }
-	}
+	ESP_ERROR_CHECK(mountSPIFFS(partition_label, base_path));
 
 #if CONFIG_ENABLE_FLASH
 	// Enable Flash Light
