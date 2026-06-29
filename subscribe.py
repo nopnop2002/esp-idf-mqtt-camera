@@ -34,7 +34,7 @@ def threadView(q1, q2):
 			q2.put(localVal)
 
 
-def on_connect(client, userdata, flags, respons_code):
+def on_connect(client, userdata, flags, respons_code, properties):
 	print('connect {0} status {1}'.format(args.host, respons_code))
 	client.subscribe(args.topic)
 
@@ -78,7 +78,7 @@ if __name__=='__main__':
 	#print("_host={}".format(_host))
 	client_id = f'python-mqtt-{random.randint(0, 1000)}'
 	print("client_id={}".format(client_id))
-	client = mqtt.Client(client_id=client_id, protocol=mqtt.MQTTv311)
+	client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id)
 	client.on_connect = on_connect
 	client.on_message = on_message
 	client.connect(_host, port=args.port, keepalive=60)

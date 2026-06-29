@@ -138,7 +138,7 @@ You can choose one of the following shutter methods
 	You can use mosquitto_pub as shutter.   
 	`mosquitto_pub -h your_broker -p 1883 -t "/take/picture" -m ""`   
 	You can use publish.py as shutter.   
-	`python3 ./publish.py`
+	`python3 ./publish.py --host your_broker`
 	![config-shutter-3](https://user-images.githubusercontent.com/6020549/200434412-adecbc77-7ba6-4520-9731-cc3eec301b84.jpg)
 
 
@@ -157,7 +157,7 @@ UICPAL ESPS3 CAM  has Quad Mode PSRAM.
 You can use subscribe.py as image viewer.   
 ```
 python3 -m pip install -U wheel
-python3 -m pip install 'paho-mqtt>=1.0.0,<2.0.0'
+python3 -m pip install paho-mqtt
 python3 -m pip install opencv-python
 
 python3 ./subscribe.py --help
